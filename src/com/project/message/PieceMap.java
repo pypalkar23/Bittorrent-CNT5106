@@ -10,7 +10,7 @@ enum StatusOfPiece {
     ABSENT
 }
 
-
+//This is an implementation of BitField using ArrayList
 public class PieceMap {
     private final ArrayList<StatusOfPiece> pieceSet;
     public int piecesPresent = 0;
