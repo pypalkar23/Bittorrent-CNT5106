@@ -28,7 +28,7 @@ public class CommonConfigReader {
         CommonConfigDetails commonConfigDetails = new CommonConfigDetails();
         String st;
         try {
-            BufferedReader in = new BufferedReader(new FileReader(commonConfigPath));
+            BufferedReader in = new BufferedReader(new FileReader(Constants.COMMON_CONFIG_FILE_NAME));
             while ((st = in.readLine()) != null) {
                 String[] tokens = st.split("\\s+");
                 if (tokens[0].equalsIgnoreCase("NumberOfPreferredNeighbors")) {

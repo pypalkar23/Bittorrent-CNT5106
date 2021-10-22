@@ -12,7 +12,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
-
 import static com.project.Utils.Constants.EXIT_MSG;
 
 public class ClientConnectionHandler extends Thread {

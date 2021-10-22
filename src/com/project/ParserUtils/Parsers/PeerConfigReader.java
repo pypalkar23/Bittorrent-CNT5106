@@ -29,7 +29,7 @@ public class PeerConfigReader {
         String st;
         peers = new ArrayList<>();
         try {
-            BufferedReader in = new BufferedReader(new FileReader( peerConfigPath));
+            BufferedReader in = new BufferedReader(new FileReader(Constants.PEER_CONFIG_FILE_NAME));
             while ((st = in.readLine()) != null) {
                 String[] tokens = st.split("\\s+");
                 peers.add(new PeerConnectionDetails(tokens[0], tokens[1], tokens[2], tokens[3]));
