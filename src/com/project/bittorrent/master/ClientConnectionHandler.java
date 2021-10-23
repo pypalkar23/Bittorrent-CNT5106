@@ -1,7 +1,7 @@
 package com.project.bittorrent.master;
 
 
-import com.project.ParserUtils.DTO.PeerConnectionDetails;
+import com.project.parserutils.dto.PeerConnectionDetails;
 import com.project.bittorrent.peer.PeerInfo;
 import com.project.message.Message;
 import com.project.message.MessageBuilder;
@@ -12,7 +12,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
-import static com.project.Utils.Constants.EXIT_MSG;
+import static com.project.utils.Constants.EXIT_MSG;
 
 public class ClientConnectionHandler extends Thread {
     private static int REMOTE_PEER_ID_INDEX = 28;

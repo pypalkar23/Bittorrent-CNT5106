@@ -1,6 +1,6 @@
 package com.project.message;
 
-import com.project.Utils.Constants;
+import com.project.utils.Constants;
 
 public class MessageValidator {
 

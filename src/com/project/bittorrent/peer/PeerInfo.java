@@ -1,9 +1,9 @@
 package com.project.bittorrent.peer;
 
-import com.project.ParserUtils.DTO.CommonConfigDetails;
-import com.project.ParserUtils.DTO.PeerConnectionDetails;
-import com.project.ParserUtils.Parsers.CommonConfigReader;
-import com.project.ParserUtils.Parsers.PeerConfigReader;
+import com.project.parserutils.dto.CommonConfigDetails;
+import com.project.parserutils.dto.PeerConnectionDetails;
+import com.project.parserutils.parsers.CommonConfigReader;
+import com.project.parserutils.parsers.PeerConfigReader;
 
 import java.util.ArrayList;
 

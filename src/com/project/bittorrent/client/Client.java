@@ -1,6 +1,6 @@
 package com.project.bittorrent.client;
 
-import com.project.ParserUtils.DTO.PeerConnectionDetails;
+import com.project.parserutils.dto.PeerConnectionDetails;
 import com.project.bittorrent.peer.PeerInfo;
 
 import java.io.IOException;

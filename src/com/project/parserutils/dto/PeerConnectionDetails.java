@@ -1,4 +1,4 @@
-package com.project.ParserUtils.DTO;
+package com.project.parserutils.dto;
 
 public class PeerConnectionDetails {
     private int id;

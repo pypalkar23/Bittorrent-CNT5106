@@ -1,7 +1,7 @@
 package com.project.logger;
 
 
-import com.project.Utils.Constants;
+import com.project.utils.Constants;
 import com.project.message.PieceMap;
 
 import java.io.FileNotFoundException;

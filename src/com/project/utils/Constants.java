@@ -1,4 +1,4 @@
-package com.project.Utils;
+package com.project.utils;
 
 public class Constants {
     public static final String MSG_HEADER = "P2PFILESHARINGPROJ";

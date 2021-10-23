@@ -1,7 +1,7 @@
-package com.project.ParserUtils.Parsers;
+package com.project.parserutils.parsers;
 
-import com.project.ParserUtils.DTO.CommonConfigDetails;
-import com.project.Utils.Constants;
+import com.project.parserutils.dto.CommonConfigDetails;
+import com.project.utils.Constants;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
