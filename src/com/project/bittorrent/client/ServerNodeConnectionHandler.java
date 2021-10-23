@@ -10,7 +10,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-public class MasterConnectionHandler extends Thread {
+public class ServerNodeConnectionHandler extends Thread {
     private final Socket serverConnectionSocket;
     private int peerIDSelf = PeerInfo.getInstance().getPeerID();
     private int remotePeerID;
@@ -18,7 +18,7 @@ public class MasterConnectionHandler extends Thread {
     private ObjectOutputStream objectOutputStream;
     private final MessageBuilder messageBuilder;
 
-    public MasterConnectionHandler(Socket serverConnectionSocket, int remotePeerID) {
+    public ServerNodeConnectionHandler(Socket serverConnectionSocket, int remotePeerID) {
         this.serverConnectionSocket = serverConnectionSocket;
         this.remotePeerID = remotePeerID;
         this.messageBuilder = new MessageBuilder();

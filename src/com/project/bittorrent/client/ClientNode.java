@@ -6,7 +6,7 @@ import com.project.bittorrent.peer.PeerInfo;
 import java.io.IOException;
 import java.net.Socket;
 
-public class Client {
+public class ClientNode {
 
     public void init() {
         PeerInfo peerInfo = PeerInfo.getInstance();
@@ -20,8 +20,8 @@ public class Client {
                 System.out.println(String.format("Socket created at %s:%s", toServer.getInetAddress(), toServer.getPort()));
                 peerInfo.setActivePeerConnections(peerConnectionDetails);
                 System.out.println(String.format("Active peer connection updated: %s",peerInfo.getActivePeerConnections()));
-                MasterConnectionHandler masterConnectionHandler = new MasterConnectionHandler(toServer, peerConnectionDetails.getId());
-                masterConnectionHandler.start();
+                ServerNodeConnectionHandler serverNodeConnectionHandler = new ServerNodeConnectionHandler(toServer, peerConnectionDetails.getId());
+                serverNodeConnectionHandler.start();
             } catch (IOException e) {
                 e.printStackTrace();
             }

@@ -1,4 +1,4 @@
-package com.project.bittorrent.master;
+package com.project.bittorrent.server;
 
 
 import com.project.parserutils.dto.PeerConnectionDetails;
@@ -14,7 +14,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import static com.project.utils.Constants.EXIT_MSG;
 
-public class ClientConnectionHandler extends Thread {
+public class ClientNodeConnectionHandler extends Thread {
     private static int REMOTE_PEER_ID_INDEX = 28;
     private final Socket client;
     private int peerIdSelf = PeerInfo.getInstance().getPeerID();
@@ -24,7 +24,7 @@ public class ClientConnectionHandler extends Thread {
     private final MessageBuilder messageBuilder;
 
 
-    public ClientConnectionHandler(Socket client) {
+    public ClientNodeConnectionHandler(Socket client) {
         this.client = client;
         this.messageBuilder = new MessageBuilder();
         try {

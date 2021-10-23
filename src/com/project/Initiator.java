@@ -1,14 +1,14 @@
 package com.project;
 
-import com.project.bittorrent.client.Client;
-import com.project.bittorrent.master.Master;
+import com.project.bittorrent.client.ClientNode;
+import com.project.bittorrent.server.ServerNode;
 
 public class Initiator {
     public void init() {
-        Master master = Master.getInstance();
-        master.start();
+        ServerNode serverNode = ServerNode.getInstance();
+        serverNode.start();
 
-        Client client = new Client();
-        client.init();
+        ClientNode clientNode = new ClientNode();
+        clientNode.init();
     }
 }

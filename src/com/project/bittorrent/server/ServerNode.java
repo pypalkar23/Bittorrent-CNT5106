@@ -1,4 +1,4 @@
-package com.project.bittorrent.master;
+package com.project.bittorrent.server;
 
 import com.project.bittorrent.peer.PeerInfo;
 
@@ -7,29 +7,29 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class Master extends Thread {
+public class ServerNode extends Thread {
     private int port;
-    private static volatile Master master;
+    private static volatile ServerNode serverNode;
 
     public int getPort() {
         return port;
     }
 
     //constructor
-    private Master(int port) {
+    private ServerNode(int port) {
         this.port = port;
     }
 
-    public static Master getInstance() {
-        if (master == null) {
+    public static ServerNode getInstance() {
+        if (serverNode == null) {
             synchronized (PeerInfo.class) {
-                if (master == null) {
+                if (serverNode == null) {
                     PeerInfo peerInfo = PeerInfo.getInstance();
-                    master = new Master(peerInfo.getPort());
+                    serverNode = new ServerNode(peerInfo.getPort());
                 }
             }
         }
-        return master;
+        return serverNode;
     }
 
     @Override
@@ -47,8 +47,8 @@ public class Master extends Thread {
             System.out.printf("\n Master running on port: %s IP: %s Thread: %s%n", this.getPort(), InetAddress.getLoopbackAddress(), Thread.currentThread().getName());
             while (true) {
                 Socket clientConnection = listener.accept();
-                ClientConnectionHandler clientConnectionHandler = new ClientConnectionHandler(clientConnection);
-                clientConnectionHandler.start();
+                ClientNodeConnectionHandler clientNodeConnectionHandler = new ClientNodeConnectionHandler(clientConnection);
+                clientNodeConnectionHandler.start();
                 //read peer connection info and store it
             }
         } catch (IOException e) {
