@@ -2,7 +2,7 @@ package com.project.logger;
 
 
 import com.project.utils.Constants;
-import com.project.message.PieceMap;
+/*import com.project.message.PieceMap;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -126,4 +126,5 @@ public class Logger {
     public void flush() {
         printWriter.flush();
     }
-}
+}*/
+

@@ -1,6 +1,6 @@
 package com.project.parserutils.parsers;
 
-import com.project.parserutils.dto.PeerConnectionDetails;
+import com.project.parserutils.dto.PeerInfo;
 import com.project.utils.Constants;
 
 import java.io.BufferedReader;
@@ -13,26 +13,17 @@ import java.util.Properties;
 //Parses peer config details and stores it in a list
 public class PeerConfigReader {
     public static final String peerConfigFileProp= "PEER_CONF_LOCATION";
-    private static ArrayList<PeerConnectionDetails> peers;
+    private static ArrayList<PeerInfo> peers;
 
-    public static ArrayList<PeerConnectionDetails> getConfiguration() {
-        Properties properties = new Properties();
-        InputStream inputStream = PeerConfigReader.class.getClassLoader().getResourceAsStream(Constants.PROPERTY_FILE_NAME);
-        try{
-            if(inputStream != null)
-                properties.load(inputStream);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public static ArrayList<PeerInfo> getConfiguration() {
 
-        String peerConfigPath = properties.getProperty(peerConfigFileProp);
         String st;
         peers = new ArrayList<>();
         try {
             BufferedReader in = new BufferedReader(new FileReader(Constants.PEER_CONFIG_FILE_NAME));
             while ((st = in.readLine()) != null) {
                 String[] tokens = st.split("\\s+");
-                peers.add(new PeerConnectionDetails(tokens[0], tokens[1], tokens[2], tokens[3]));
+                peers.add(new PeerInfo(tokens[0], tokens[1], tokens[2], tokens[3]));
             }
             in.close();
         } catch (Exception ex) {
