@@ -11,21 +11,12 @@ import com.project.parserutils.dto.CommonInfo;
 import com.project.parserutils.dto.PeerInfo;
 
 import java.io.*;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class peerProcess {
     private static final char CHOKE = '0';
     private static final char UNCHOKE = '1';
-    private static final char INTERESTED = '2';
-    private static final char NOT_INTERESTED = '3';
-    private static final char HAVE = '4';
-    private static final char BITFIELD = '5';
-    private static final char REQUEST = '6';
-    private static final char PIECE = '7';
     private static int hostID;
     private static Map<Integer, PeerInfo> peers;
     private static byte[][] filePieces;
@@ -37,8 +28,9 @@ public class peerProcess {
     private static CommonInfo common;
     private static int completedPeers = 0;
     private static File directory;
+    private static CommonData commonData;
     public static void main(String[] args) {
-        CommonData commonData = new CommonData();
+        commonData = new CommonData();
         System.out.println("Starting Process");
         hostID = Integer.parseInt(args[0]);
         try {
@@ -163,13 +155,10 @@ public class peerProcess {
     }
 
 
-
-
-
     private static class UnchokePeers extends Thread{
         @Override
         public void run(){
-            while(completedPeers < peers.size()){
+            while(commonData.getValue() < peers.size()){
                 ArrayList<Integer> connections = new ArrayList<>(peerConnections.keySet());
                 int[] preferredNeighbors = new int[common.getNumberOfPreferredNeighbors()];
                 if(thisPeer.getHaveFile() == 1) {
@@ -266,7 +255,7 @@ public class peerProcess {
     private static class OptimisticUnchokePeer extends Thread{
         @Override
         public void run(){
-            while (completedPeers < peers.size()) {
+            while (commonData.getValue()  < peers.size()) {
                 ArrayList<Integer> connections = new ArrayList<>(peerConnections.keySet());
                 ArrayList<Integer> interested = new ArrayList<>();
                 for(int connection : connections){
