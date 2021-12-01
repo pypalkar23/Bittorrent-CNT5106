@@ -1,130 +1,253 @@
 package com.project.logger;
 
-
-import com.project.utils.Constants;
-/*import com.project.message.PieceMap;
-
-import java.io.FileNotFoundException;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.time.LocalTime;
-import java.util.ArrayList;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class Logger {
-    PrintWriter printWriter;
+    private DateFormat timeFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+    private Date time = new Date();
+    private BufferedWriter writer;
 
-    public Logger(String filePath) {
-        try {
-            printWriter = new PrintWriter(filePath);
+    public Logger(int hostID) throws IOException {
+        File log_file = new File(System.getProperty("user.dir") + "/" + "log_peer_" + hostID + ".log");
+        if (log_file.exists() == false)
+            log_file.createNewFile();
+        writer = new BufferedWriter(new FileWriter(log_file.getAbsolutePath(), true));
+        writer.flush();
+        timeFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+    }
+
+    public void connectionTo(int id1,int id2) { //hasMadeConnection {
+        time = new Date();
+        StringBuffer log = new StringBuffer();
+        log.append(timeFormat.format(time));
+        log.append(':');
+        log.append(" Peer ");
+        log.append(id1);
+        log.append(" makes a connection to Peer ");
+        log.append(id2);
+        log.append('.');
+        try{
+            writer.write(log.toString());
+            writer.newLine();
+            writer.flush();
         }
-        catch (FileNotFoundException e) {
-            e.printStackTrace();
+        catch(Exception e){
+//            e.printStackTrace();
         }
     }
 
-    public synchronized void hasMadeConnection(int peerIdSelf, int peerIdOther) throws IOException {
-        printWriter.printf("%s : Peer %s makes a connection to Peer %s.\n", LocalTime.now(), peerIdSelf, peerIdOther);
+    public void connectionFrom(int id1, int id2) { //isConnected{
+        time = new Date();
+        StringBuffer log = new StringBuffer();
+        log.append(timeFormat.format(time));
+        log.append(':');
+        log.append(" Peer ");
+        log.append(id1);
+        log.append(" is connected from Peer ");
+        log.append(id2);
+        log.append('.');
+        try{
+            writer.write(log.toString());
+            writer.newLine();
+            writer.flush();
+        }
+        catch(Exception e){
+//            e.printStackTrace();
+        }
     }
 
-    //connected
-    public synchronized void isConnected(int peerIdSelf, int peerIdOther) {
-        printWriter.printf("%s : Peer %s is connected from Peer %s.\n", LocalTime.now(), peerIdSelf, peerIdOther);
+    public void changePreferredNeighbors(int id1, int[] ids) { //preferredNeigfhboursChanged{
+        time = new Date();
+        StringBuffer log = new StringBuffer();
+        log.append(timeFormat.format(time));
+        log.append(':');
+        log.append(" Peer ");
+        log.append(id1);
+        log.append(" has the preferred neighbors ");
+        for(int id : ids){
+            log.append(id);
+            log.append(',');
+        }
+        log.deleteCharAt(log.length() - 1);
+        log.append('.');
+        try{
+            writer.write(log.toString());
+            writer.newLine();
+            writer.flush();
+        }
+        catch(Exception e){
+//            e.printStackTrace();
+        }
     }
 
-
-    public synchronized void hasSentPieceMap(int neigh,PieceMap pieceMap) {
-        printWriter.printf("%s : sent a PieceMap to %s with file %s \n", LocalTime.now(), neigh, pieceMap.isFull() ? Constants.FULL_STATUS : Constants.EMPTY_STATUS);
+    public void changeOptimisticallyUnchokedNeighbor(int id1, int id2){ // hasOptimisticallyUnchockedNeighbour
+        time = new Date();
+        StringBuffer log = new StringBuffer();
+        log.append(timeFormat.format(time));
+        log.append(':');
+        log.append(" Peer ");
+        log.append(id1);
+        log.append(" has the optimistically unchoked neighbor ");
+        log.append(id2);
+        log.append('.');
+        try{
+            writer.write(log.toString());
+            writer.newLine();
+            writer.flush();
+        }
+        catch(Exception e){
+//            e.printStackTrace();
+        }
     }
 
-
-    public synchronized void hasReceivedPieceMap(int neigh,PieceMap pieceMap) {
-        printWriter.printf("%s : received a PieceMap from %s with file %s \n", LocalTime.now(), neigh, pieceMap.isFull() ? Constants.FULL_STATUS : Constants.EMPTY_STATUS);
+    public void unchoked(int id1, int id2){ //hasBeenUnchocked
+        time = new Date();
+        StringBuffer log = new StringBuffer();
+        log.append(timeFormat.format(time));
+        log.append(':');
+        log.append(" Peer ");
+        log.append(id1);
+        log.append(" is unchoked by ");
+        log.append(id2);
+        log.append('.');
+        try{
+            writer.write(log.toString());
+            writer.newLine();
+            writer.flush();
+        }
+        catch(Exception e){
+//            e.printStackTrace();
+        }
     }
 
-
-    public synchronized void preferredNeighboursChanged(int peerIdSelf,ArrayList<Integer> neighborList) {
-        printWriter.printf("%s : Peer %s has the preferred neighbors ", LocalTime.now(), peerIdSelf);
-        neighborList.forEach(neighbor -> { printWriter.printf(", %s", neighbor); });
-        printWriter.printf(".\n");
+    public void choked(int id1, int id2){ //hasBeenChocked
+        time = new Date();
+        StringBuffer log = new StringBuffer();
+        log.append(timeFormat.format(time));
+        log.append(':');
+        log.append(" Peer ");
+        log.append(id1);
+        log.append(" is choked by ");
+        log.append(id2);
+        log.append('.');
+        try{
+            writer.write(log.toString());
+            writer.newLine();
+            writer.flush();
+        }
+        catch(Exception e){
+//            e.printStackTrace();
+        }
     }
 
-
-    public synchronized void hasOptimisticallyUnchockedNeighbour(int peerIdSelf, int neighbor) {
-        printWriter.printf("%s : Peer %s has the optimistically unchoked neighbor %s.\n", LocalTime.now(), peerIdSelf, neighbor);
+    public void receiveHave(int id1, int id2, int index){ //hasReceivedHave
+        time = new Date();
+        StringBuffer log = new StringBuffer();
+        log.append(timeFormat.format(time));
+        log.append(':');
+        log.append(" Peer ");
+        log.append(id1);
+        log.append(" received the 'have' message from ");
+        log.append(id2);
+        log.append(" for the piece ");
+        log.append(index);
+        log.append('.');
+        try{
+            writer.write(log.toString());
+            writer.newLine();
+            writer.flush();
+        }
+        catch(Exception e){
+//            e.printStackTrace();
+        }
     }
 
-
-    public synchronized void hasSentUnchokeSignal(int peerIdSelf, int neighbor) {
-        printWriter.printf("%s : Peer %s sent unchoke to %s.\n", LocalTime.now(),peerIdSelf, neighbor);
+    public void receiveInterested(int id1, int id2){ //hasReceivedInterested
+        time = new Date();
+        StringBuffer log = new StringBuffer();
+        log.append(timeFormat.format(time));
+        log.append(':');
+        log.append(" Peer ");
+        log.append(id1);
+        log.append(" received the 'interested' message from ");
+        log.append(id2);
+        log.append('.');
+        try{
+            writer.write(log.toString());
+            writer.newLine();
+            writer.flush();
+        }
+        catch(Exception e){
+//            e.printStackTrace();
+        }
     }
 
-    public synchronized void hasSentChokeSignal(int peerIdSelf, int neighbor) {
-        printWriter.printf("%s : Peer %s sent choke to %s.\n", LocalTime.now(), peerIdSelf, neighbor);
+    public void receiveNotInterested(int id1, int id2){ //hasReceivedNotInterested
+        time = new Date();
+        StringBuffer log = new StringBuffer();
+        log.append(timeFormat.format(time));
+        log.append(':');
+        log.append(" Peer ");
+        log.append(id1);
+        log.append(" received the 'not interested' message from ");
+        log.append(id2);
+        log.append('.');
+        try{
+            writer.write(log.toString());
+            writer.newLine();
+            writer.flush();
+        }
+        catch(Exception e){
+//            e.printStackTrace();
+        }
     }
 
-    public synchronized void hasBeenChocked(int peerIdSelf, int neighbor) {
-        printWriter.printf("%s : Peer %s is choked by %s.\n", LocalTime.now(), peerIdSelf, neighbor);
+    public void downloadingPiece(int id1, int id2, int index, int numOfPieces){ //hasDownloaded
+        time = new Date();
+        StringBuffer log = new StringBuffer();
+        log.append(timeFormat.format(time));
+        log.append(':');
+        log.append(" Peer ");
+        log.append(id1);
+        log.append(" has downloaded the piece ");
+        log.append(index);
+        log.append(" from ");
+        log.append(id2);
+        log.append(".\n");
+        log.append("Now the number of pieces it has is ");
+        log.append(numOfPieces);
+        log.append('.');
+        try{
+            writer.write(log.toString());
+            writer.newLine();
+            writer.flush();
+        }
+        catch(Exception e){
+//            e.printStackTrace();
+        }
     }
 
-    public synchronized void hasBeenUnchocked(int peerIdSelf, int neighbor) {
-        printWriter.printf("%s : Peer %s is unchoked by %s.\n", LocalTime.now(), peerIdSelf, neighbor);
+    public void downloadCompleted(int id1){ //operationCompleted
+        time = new Date();
+        StringBuffer log = new StringBuffer();
+        log.append(timeFormat.format(time));
+        log.append(':');
+        log.append(" Peer ");
+        log.append(id1);
+        log.append(" has downloaded the complete file ");
+        try{
+            writer.write(log.toString());
+            writer.newLine();
+            writer.flush();
+        }
+        catch(Exception e){
+//            e.printStackTrace();
+        }
     }
-
-    public synchronized void hasSentHave(int peer, int index) {
-        printWriter.printf("%s : sent have to %s index: %s \n", LocalTime.now(), peer, index);
-    }
-
-    public synchronized void hasreceivedHave(int peerIdSelf, int peerIdOther, int pieceIndex) {
-        printWriter.printf("%s : Peer %s received the 'have' message from %s for the piece %s.\n", LocalTime.now(), peerIdSelf, peerIdOther, pieceIndex);
-    }
-
-    public synchronized void hasSentInterested(int peerIdSelf, int peerIdOther) {
-        printWriter.printf("%s : Peer %s send 'interested' message to %s.\n", LocalTime.now(), peerIdSelf, peerIdOther);
-    }
-
-    public synchronized void hasReceivedInterested(int peerIdSelf, int peerIdOther) {
-        printWriter.printf("%s : Peer %s received the 'interested' message from %s.\n", LocalTime.now(), peerIdSelf, peerIdOther);
-    }
-
-    public synchronized void hasSentNotInterested(int peerIdSelf, int peerIdOther) {
-        printWriter.printf("%s : Peer %s sent 'not interested' message to %s.\n", LocalTime.now(), peerIdSelf, peerIdOther);
-    }
-
-    public synchronized void hasReceivedNotInterested(int peerIdSelf, int peerIdOther) {
-        printWriter.printf("%s : Peer %s received the 'not interested' message from %s.\n", LocalTime.now(), peerIdSelf, peerIdOther);
-    }
-
-    public synchronized void hasSentRequest(int peerIdSelf, int request) {
-        printWriter.printf("%s : requesting %s from %s.\n", LocalTime.now(), request, peerIdSelf);
-    }
-
-    public synchronized void hasRequested(int peerIdSelf, int request) {
-        printWriter.printf("%s : Peer %s requested %s.\n", LocalTime.now(), peerIdSelf, request);
-    }
-
-    public synchronized void hasSentPiece(int neigh, int pieceIndex) {
-        printWriter.printf("%s : sent piece %s to %s \n", LocalTime.now(), pieceIndex, neigh);
-    }
-
-    public synchronized void hasDownloaded(int peerIdSelf, int peerIdOther, int pieceIndex, int numPieces) {
-        printWriter.printf("%s : Peer %s has downloaded the piece %s from %s. Now the number of pieces it has is %s.\n", LocalTime.now(), peerIdSelf, pieceIndex, peerIdOther, numPieces);
-    }
-
-
-    public synchronized void operationCompleted(int peerIDSelf) {
-        printWriter.printf("%s : Peer %s has downloaded the complete file.\n", LocalTime.now(), peerIDSelf);
-    }
-
-    public synchronized void hasDownloadedFile(int peerIdSelf, int neigh) {
-        printWriter.printf("%s : Peer %s has downloaded the complete file from %s\n", LocalTime.now(), peerIdSelf, neigh);
-    }
-
-    public void close() {
-        printWriter.close();
-    }
-
-    public void flush() {
-        printWriter.flush();
-    }
-}*/
-
+}

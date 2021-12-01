@@ -5,25 +5,22 @@ import com.project.utils.Constants;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Properties;
+import java.util.*;
 
 //Parses peer config details and stores it in a list
 public class PeerConfigReader {
-    public static final String peerConfigFileProp= "PEER_CONF_LOCATION";
-    private static ArrayList<PeerInfo> peers;
+    private static HashMap<Integer,PeerInfo> peers;
 
-    public static ArrayList<PeerInfo> getConfiguration() {
+    public static Map<Integer,PeerInfo> getConfiguration() {
 
         String st;
-        peers = new ArrayList<>();
+        peers = new LinkedHashMap<>();
         try {
             BufferedReader in = new BufferedReader(new FileReader(Constants.PEER_CONFIG_FILE_NAME));
             while ((st = in.readLine()) != null) {
                 String[] tokens = st.split("\\s+");
-                peers.add(new PeerInfo(tokens[0], tokens[1], tokens[2], tokens[3]));
+                PeerInfo peer = new PeerInfo(tokens[0], tokens[1], tokens[2], tokens[3]);
+                peers.put(peer.getPeerID(),peer);
             }
             in.close();
         } catch (Exception ex) {

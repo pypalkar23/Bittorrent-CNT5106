@@ -2,10 +2,12 @@ package com.project.utils;
 
 public class Constants {
     public static final String MSG_HEADER = "P2PFILESHARINGPROJ";
-    public static final String EXIT_MSG = "EXIT";
-    public static final String FULL_STATUS = "FULL";
-    public static final String EMPTY_STATUS = "EMPTY";
-    public static final String PROPERTY_FILE_NAME= "application.properties";
+    public static final String NO_OF_PREF_NEIGHBOURS_FIELD = "NumberOfPreferredNeighbors";
+    public static final String UNCHOKING_INTERVAL_FIELD = "UnchokingInterval";
+    public static final String OPTIMISTIC_UNCHOKING_INTERVAL = "OptimisticUnchokingInterval";
+    public static final String FILENAME_FIELD = "FileName";
+    public static final String FILESIZE_FIELD = "FileSize";
+    public static final String PIECE_SIZE_FIELD = "PieceSize";
     public static final String COMMON_CONFIG_FILE_NAME= "Common.cfg";
     public static final String PEER_CONFIG_FILE_NAME= "PeerInfo.cfg";
     public static final char CHOKE = '0';

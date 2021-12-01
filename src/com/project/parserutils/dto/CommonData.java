@@ -9,13 +9,13 @@ public class CommonData {
         completedPeers = new AtomicInteger(0);
     }
 
-    public int getValue(){
+    public int getCompletedPeers(){
         return completedPeers.get();
     }
 
-    public void increment(){
+    public void incrementCompletedPeers(){
         while(true){
-            int existingValue = getValue();
+            int existingValue = getCompletedPeers();
             int newValue = existingValue+1;
             if(completedPeers.compareAndSet(existingValue,newValue)){
                 return;

@@ -1,6 +1,6 @@
 package com.project.connectionUtils;
 
-import com.project.logger.Logs;
+import com.project.logger.Logger;
 import com.project.message.Messages;
 import com.project.parserutils.dto.CommonData;
 import com.project.parserutils.dto.CommonInfo;
@@ -19,7 +19,7 @@ public class ReceiveConnections extends Thread{
     PeerInfo peer;
     Map<Integer,PeerConnection> peerConnections;
     Map<Integer, PeerInfo> peers;
-    Logs logs;
+    Logger logger;
     Messages msg;
     int hostID;
     CommonInfo commonInfo;
@@ -27,12 +27,12 @@ public class ReceiveConnections extends Thread{
     byte[][] filePieces;
     CommonData commonData;
 
-    public ReceiveConnections(int hostID, Map<Integer, PeerInfo> peers, Map<Integer,PeerConnection> peerConnections, Logs logs, Messages msg, CommonInfo commonInfo, File directory, byte[][] filePieces, CommonData commonData){
+    public ReceiveConnections(int hostID, Map<Integer, PeerInfo> peers, Map<Integer,PeerConnection> peerConnections, Logger logger, Messages msg, CommonInfo commonInfo, File directory, byte[][] filePieces, CommonData commonData){
         this.hostID = hostID;
         this.peers = peers;
         this.peer = peers.get(hostID);
         this.peerConnections = peerConnections;
-        this.logs = logs;
+        this.logger = logger;
         this.msg = msg;
         this.commonInfo = commonInfo;
         this.directory = directory;
@@ -50,12 +50,12 @@ public class ReceiveConnections extends Thread{
                 DataInputStream dataInputStream = new DataInputStream(connection.getInputStream());
                 dataInputStream.readFully(buffer);
                 int peerID = ByteBuffer.wrap(Arrays.copyOfRange(buffer, 28, 32)).getInt();
-                logs.connectionFrom(hostID, peerID);
+                logger.connectionFrom(hostID, peerID);
                 StringBuilder handshakeMsg = new StringBuilder();
                 handshakeMsg.append(new String(Arrays.copyOfRange(buffer, 0, 28)));
                 handshakeMsg.append(peerID);
                 System.out.println(handshakeMsg);
-                peerConnections.put(peerID, new PeerConnection(peer, peerConnections, peers, connection, peerID, msg, logs,commonInfo,directory,filePieces,commonData));
+                peerConnections.put(peerID, new PeerConnection(peer, peerConnections, peers, connection, peerID, msg, logger,commonInfo,directory,filePieces,commonData));
                 DataOutputStream dataOutputStream = new DataOutputStream(connection.getOutputStream());
                 dataOutputStream.flush();
                 dataOutputStream.write(msg.getHandshakeMessage(hostID));

@@ -1,6 +1,6 @@
 package com.project.connectionUtils;
 
-import com.project.logger.Logs;
+import com.project.logger.Logger;
 import com.project.message.Messages;
 import com.project.parserutils.dto.CommonData;
 import com.project.parserutils.dto.CommonInfo;
@@ -22,24 +22,25 @@ public class PeerConnection {
     private double downloadRate = 0;
     private Messages msg;
     private PeerInfo peer;
-    private Logs logs;
+    private Logger logger;
     private CommonInfo commonInfo;
     private File directory;
     private byte[][] filePieces;
     private CommonData commonData;
     Map<Integer,PeerInfo> peers;
-    public PeerConnection(PeerInfo peer, Map<Integer,PeerConnection> peerConnections, Map<Integer,PeerInfo> peers, Socket conn, int id, Messages msg, Logs logs, CommonInfo commonInfo, File directory, byte[][] filePieces, CommonData commonData) {
+
+    public PeerConnection(PeerInfo peer, Map<Integer,PeerConnection> peerConnections, Map<Integer,PeerInfo> peers, Socket conn, int id, Messages msg, Logger logger, CommonInfo commonInfo, File directory, byte[][] filePieces, CommonData commonData) {
         this.peer = peer;
         this.connection = conn;
         this.peerID = id;
         this.msg = msg;
-        this.logs = logs;
+        this.logger = logger;
         this.commonInfo = commonInfo;
         this.directory = directory;
         this.filePieces = filePieces;
         this.commonData = commonData;
         this.peers = peers;
-        (new ReaderThread(this,peerConnections,peer,peers,logs,filePieces,commonInfo,commonData)).start();
+        (new ReaderThread(this,peerConnections,peer,peers, logger,filePieces,commonInfo,commonData)).start();
     }
     public double getDownloadRate() {
         return downloadRate;
@@ -181,7 +182,7 @@ public class PeerConnection {
                 counter++;
         }
         if (counter == peer.getBitfield().length) {
-            logs.downloadCompleted(peer.getPeerID());
+            logger.downloadCompleted(peer.getPeerID());
             counter = 0;
             byte[] merge = new byte[commonInfo.getFileSize()];
             for (byte[] piece : filePieces) {
@@ -199,7 +200,7 @@ public class PeerConnection {
                 System.out.println("File Download Completed.");
                 peer.setHaveFile(1);
                 //completedPeers++
-                commonData.increment();
+                commonData.incrementCompletedPeers();
             } catch (IOException e) {
 //                    e.printStackTrace();
             }
