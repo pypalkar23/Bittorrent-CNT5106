@@ -60,7 +60,7 @@ public class peerProcess {
             Helpers.startHelperThreads(commonDataStore);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
     }
 

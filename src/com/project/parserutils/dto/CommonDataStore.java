@@ -8,6 +8,7 @@ import java.io.File;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+//A Common Datastore to make required data accessible to all other classes
 public class CommonDataStore {
     private final AtomicInteger completedPeers;
     private int hostID;

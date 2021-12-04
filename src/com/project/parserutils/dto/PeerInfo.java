@@ -9,7 +9,6 @@ public class PeerInfo {
     private int numOfPieces = 0;
 
     public PeerInfo(){
-
     }
 
     public PeerInfo (String peerId, String hostName,String portNumber,String haveFile){

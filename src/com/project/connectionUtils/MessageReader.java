@@ -21,15 +21,15 @@ public class MessageReader extends Thread{
     private final Map<Integer,PeerInfo> peers;
     private final Map<Integer, ConnectionInfo> connectedPeers;
 
-    public MessageReader(ConnectionInfo connectionInfo, Map<Integer, ConnectionInfo> connectedPeers, PeerInfo peerSelf, Map<Integer,PeerInfo> peers, Logger logger, byte[][] filePieces, CommonConfig commonConfig, CommonDataStore commonDataStore){
+    public MessageReader(ConnectionInfo connectionInfo, CommonDataStore commonDataStore){
         this.connectionInfo = connectionInfo;
-        this.peerSelf = peerSelf;
-        this.peers = peers;
-        this.filePieces = filePieces;
-        this.logger = logger;
-        this.commonConfig = commonConfig;
         this.commonDataStore = commonDataStore;
-        this.connectedPeers = connectedPeers;
+        this.peers = commonDataStore.getPeers();
+        this.peerSelf = commonDataStore.getPeers().get(commonDataStore.getHostID());
+        this.filePieces = commonDataStore.getFilePieces();
+        this.logger = commonDataStore.getLogger();
+        this.commonConfig = commonDataStore.getCommonConfig();
+        this.connectedPeers = commonDataStore.getConnections();
     }
 
     @Override
@@ -40,7 +40,7 @@ public class MessageReader extends Thread{
         {
             try{
                 DataInputStream ipStream = new DataInputStream(connectionInfo.getConnection().getInputStream());
-                connectionInfo.sendMessage(Constants.BITFIELD);
+                connectionInfo.sendCommand(Constants.BITFIELD);
                 while(commonDataStore.getCompletedPeers() < peers.size()){
                     int msgLength = ipStream.readInt();
                     byte[] buffer = new byte[msgLength];
@@ -75,7 +75,7 @@ public class MessageReader extends Thread{
                             connectionInfo.setNotInterested();
                             if(!connectionInfo.isChoked()){
                                 connectionInfo.choke();
-                                connectionInfo.sendMessage(Constants.CHOKE);
+                                connectionInfo.sendCommand(Constants.CHOKE);
                             }
                             break;
                         case Constants.HAVE:
@@ -109,7 +109,6 @@ public class MessageReader extends Thread{
                             }
                             if(bits == peerSelf.getBitfield().length){
                                 peers.get(connectionInfo.getPeerID()).setHaveFile(1);
-                                //completedPeers++;
                                 commonDataStore.incrementCompletedPeers();
                             }
                             else{
@@ -118,7 +117,7 @@ public class MessageReader extends Thread{
                             connectionInfo.compareBitfield(peerSelf.getBitfield(), bitfield, bitfield.length);
                             break;
                         case Constants.REQUEST:
-                            connectionInfo.sendMessage(Constants.PIECE, ByteBuffer.wrap(msg).getInt());
+                            connectionInfo.sendFileRelatedMessage(Constants.PIECE, ByteBuffer.wrap(msg).getInt());
                             break;
                         case Constants.PIECE:
                             index = ByteBuffer.wrap(Arrays.copyOfRange(msg, 0, 4)).getInt();
@@ -141,14 +140,10 @@ public class MessageReader extends Thread{
                                 connectionInfo.setDownloadRate(rate);
                             }
                             logger.hasDownloadedMsg(peerSelf.getPeerID(), connectionInfo.getPeerID(), index, peerSelf.getNumOfPieces());
-                            int downloaded = (peerSelf.getNumOfPieces() * 100) / (int)Math.ceil((double) commonConfig.getFileSize()/ commonConfig.getPieceSize());
-                            /*StringBuffer sb = new StringBuffer();
-                            sb.append("\r").append("Downloaded: ");
-                            sb.append(downloaded).append("%").append(" Number of Pieces: ").append(peerSelf.getNumOfPieces());
-                            System.out.print(sb);*/
+                            int downlaadPercentage = (peerSelf.getNumOfPieces() * 100) / (int)Math.ceil((double) commonConfig.getFileSize()/ commonConfig.getPieceSize());
                             connectionInfo.checkIfComplete();
                             for(int connection : connectedPeers.keySet()){
-                                connectedPeers.get(connection).sendMessage(Constants.HAVE, index);
+                                connectedPeers.get(connection).sendFileRelatedMessage(Constants.HAVE, index);
                             }
                             break;
                         default:
@@ -159,7 +154,7 @@ public class MessageReader extends Thread{
                 System.exit(0);
             }
             catch(Exception e){
-                e.printStackTrace();
+                //e.printStackTrace();
             }
         }
     }

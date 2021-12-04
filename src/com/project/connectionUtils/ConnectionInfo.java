@@ -11,39 +11,37 @@ import com.project.utils.Constants;
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.Random;
 
 public class ConnectionInfo {
     private final Socket connection;
-    private final int peerID;
     private boolean interested;
     private boolean choked;
     private boolean optimisticallyUnchoked;
     private double downloadRate;
-    private final Message msg;
     private final PeerInfo peer;
+    private final int peerID;
+    private final Message msg;
     private final Logger logger;
-    private final CommonConfig commonConfig;
     private final File directory;
     private final byte[][] filePieces;
+    private final CommonConfig commonConfig;
     private final CommonDataStore commonDataStore;
-    private Map<Integer,PeerInfo> peers;
 
-    public ConnectionInfo(PeerInfo peer, Map<Integer, ConnectionInfo> peerConnections, Map<Integer,PeerInfo> peers, Socket conn, int peerID, Message msg, Logger logger, CommonConfig commonConfig, File directory, byte[][] filePieces, CommonDataStore commonDataStore) {
-        this.commonDataStore = commonDataStore;
-        this.connection = conn;
-        this.peerID = peerID;
-        this.msg = msg;
-        this.logger = logger;
-        this.commonConfig = commonConfig;
-        this.directory = directory;
-        this.filePieces = filePieces;
-        this.peers = peers;
-        this.peer = peer;
+
+    public ConnectionInfo(CommonDataStore commonDataStore, Socket conn, int peerID) {
         choked = true;
         downloadRate = 0;
-        (new MessageReader(this,peerConnections,peer,peers, logger,filePieces, commonConfig, commonDataStore)).start();
+        this.connection = conn;
+        this.peerID = peerID;
+        this.logger = commonDataStore.getLogger();
+        this.peer = commonDataStore.getPeers().get(commonDataStore.getHostID());
+        this.msg = commonDataStore.getMsg();
+        this.directory = commonDataStore.getDirectory();
+        this.filePieces = commonDataStore.getFilePieces();
+        this.commonConfig = commonDataStore.getCommonConfig();
+        this.commonDataStore = commonDataStore;
+        (new MessageReader(this, commonDataStore)).start();
     }
     public double getDownloadRate() {
         return downloadRate;
@@ -97,7 +95,7 @@ public class ConnectionInfo {
         return connection;
     }
 
-    public void sendMessage(char type) {
+    public void sendCommand(char type) {
         try {
             DataOutputStream opStream = new DataOutputStream(connection.getOutputStream());
             opStream.flush();
@@ -122,11 +120,11 @@ public class ConnectionInfo {
             }
             opStream.flush();
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
     }
 
-    public void sendMessage(char type, int index) {
+    public void sendFileRelatedMessage(char type, int index) {
         try {
             DataOutputStream opStream = new DataOutputStream(connection.getOutputStream());
             opStream.flush();
@@ -145,7 +143,7 @@ public class ConnectionInfo {
             }
             opStream.flush();
         } catch (Exception e) {
-                e.printStackTrace();
+                //e.printStackTrace();
         }
     }
 
@@ -153,12 +151,12 @@ public class ConnectionInfo {
         int i;
         for (i = 0; i < len; i++) {
             if (peerBitFieldSelf[i] == 0 && peerBitFieldOther[i] == 1) {
-                sendMessage(Constants.INTERESTED);
+                sendCommand(Constants.INTERESTED);
                 break;
             }
         }
         if (i == len)
-            sendMessage(Constants.NOT_INTERESTED);
+            sendCommand(Constants.NOT_INTERESTED);
     }
 
     public void getPieceIndex(int[] peerBitFieldSelf, int[] peerBitFieldOther, int len) {
@@ -172,7 +170,7 @@ public class ConnectionInfo {
         Random r = new Random();
         if (indices.size() > 0) {
             int index = indices.get(Math.abs(r.nextInt() % indices.size()));
-            sendMessage(Constants.REQUEST, index);
+            sendFileRelatedMessage(Constants.REQUEST, index);
         }
     }
 
@@ -202,7 +200,7 @@ public class ConnectionInfo {
                 peer.setHaveFile(1);
                 commonDataStore.incrementCompletedPeers();
             } catch (IOException e) {
-                e.printStackTrace();
+                //e.printStackTrace();
             }
         }
     }

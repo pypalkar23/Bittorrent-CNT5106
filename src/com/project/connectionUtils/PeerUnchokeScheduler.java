@@ -16,12 +16,12 @@ public class PeerUnchokeScheduler extends Thread{
     private final CommonConfig commonConfig;
     private final CommonDataStore commonDataStore;
     private final Map<Integer, PeerInfo> peers;
-    private final Map<Integer, ConnectionInfo> peerConnections;
+    private final Map<Integer, ConnectionInfo> connectedPeers;
 
     public PeerUnchokeScheduler(CommonDataStore commonDataStore){
         this.commonDataStore = commonDataStore;
         this.peers = commonDataStore.getPeers();
-        this.peerConnections = commonDataStore.getConnections();
+        this.connectedPeers = commonDataStore.getConnections();
         this.commonConfig = commonDataStore.getCommonConfig();
         this.logger = commonDataStore.getLogger();
         this.selfPeer = this.peers.get(commonDataStore.getHostID());
@@ -30,20 +30,20 @@ public class PeerUnchokeScheduler extends Thread{
     @Override
     public void run(){
         while(commonDataStore.getCompletedPeers() < peers.size()){
-            ArrayList<Integer> connections = new ArrayList<>(peerConnections.keySet());
+            ArrayList<Integer> connections = new ArrayList<>(connectedPeers.keySet());
             int[] preferredNeighbors = new int[commonConfig.getNumberOfPreferredNeighbors()];
             if(selfPeer.getHaveFile() == 1) {
                 ArrayList<Integer> interestedPeers = new ArrayList<>();
                 for (int peer : connections) {
-                    if(peerConnections.get(peer).isInterested())
+                    if(connectedPeers.get(peer).isInterested())
                         interestedPeers.add(peer);
                 }
                 if (interestedPeers.size() > 0) {
                     if (interestedPeers.size() <= commonConfig.getNumberOfPreferredNeighbors()) {
                         for (Integer peer : interestedPeers) {
-                            if(peerConnections.get(peer).isChoked()){
-                                peerConnections.get(peer).unchoke();
-                                peerConnections.get(peer).sendMessage(Constants.UNCHOKE);
+                            if(connectedPeers.get(peer).isChoked()){
+                                connectedPeers.get(peer).unchoke();
+                                connectedPeers.get(peer).sendCommand(Constants.UNCHOKE);
                             }
                         }
                     } else {
@@ -52,15 +52,15 @@ public class PeerUnchokeScheduler extends Thread{
                             preferredNeighbors[i] = (interestedPeers.remove(Math.abs(r.nextInt() % interestedPeers.size())));
                         }
                         for (int peer : preferredNeighbors) {
-                            if(peerConnections.get(peer).isChoked()){
-                                peerConnections.get(peer).unchoke();
-                                peerConnections.get(peer).sendMessage(Constants.UNCHOKE);
+                            if(connectedPeers.get(peer).isChoked()){
+                                connectedPeers.get(peer).unchoke();
+                                connectedPeers.get(peer).sendCommand(Constants.UNCHOKE);
                             }
                         }
                         for (Integer peer : interestedPeers) {
-                            if(!peerConnections.get(peer).isChoked() && !peerConnections.get(peer).isOptimisticallyUnchoked()){
-                                peerConnections.get(peer).choke();
-                                peerConnections.get(peer).sendMessage(Constants.CHOKE);
+                            if(!connectedPeers.get(peer).isChoked() && !connectedPeers.get(peer).isOptimisticallyUnchoked()){
+                                connectedPeers.get(peer).choke();
+                                connectedPeers.get(peer).sendCommand(Constants.CHOKE);
                             }
                         }
                     }
@@ -70,15 +70,15 @@ public class PeerUnchokeScheduler extends Thread{
                 ArrayList<Integer> interestedPeers = new ArrayList<>();
                 int counter = 0;
                 for (int peer : connections) {
-                    if(peerConnections.get(peer).isInterested() && peerConnections.get(peer).getDownloadRate() >= 0)
+                    if(connectedPeers.get(peer).isInterested() && connectedPeers.get(peer).getDownloadRate() >= 0)
                         interestedPeers.add(peer);
                 }
                 if(interestedPeers.size() <= commonConfig.getNumberOfPreferredNeighbors()){
                     for(int peer : interestedPeers){
                         preferredNeighbors[counter++] = peer;
-                        if(peerConnections.get(peer).isChoked()){
-                            peerConnections.get(peer).unchoke();
-                            peerConnections.get(peer).sendMessage(Constants.UNCHOKE);
+                        if(connectedPeers.get(peer).isChoked()){
+                            connectedPeers.get(peer).unchoke();
+                            connectedPeers.get(peer).sendCommand(Constants.UNCHOKE);
                         }
                     }
                 }
@@ -86,21 +86,21 @@ public class PeerUnchokeScheduler extends Thread{
                     for (int i = 0; i < commonConfig.getNumberOfPreferredNeighbors(); i++) {
                         int max = interestedPeers.get(0);
                         for(int j = 1; j < interestedPeers.size(); j++){
-                            if(peerConnections.get(max).getDownloadRate() <= peerConnections.get(interestedPeers.get(j)).getDownloadRate()){
+                            if(connectedPeers.get(max).getDownloadRate() <= connectedPeers.get(interestedPeers.get(j)).getDownloadRate()){
                                 max = interestedPeers.get(j);
                             }
                         }
-                        if(peerConnections.get(max).isChoked()) {
-                            peerConnections.get(max).unchoke();
-                            peerConnections.get(max).sendMessage(Constants.UNCHOKE);
+                        if(connectedPeers.get(max).isChoked()) {
+                            connectedPeers.get(max).unchoke();
+                            connectedPeers.get(max).sendCommand(Constants.UNCHOKE);
                         }
                         preferredNeighbors[i] = max;
                         interestedPeers.remove(Integer.valueOf(max));
                     }
                     for (Integer peer : interestedPeers) {
-                        if(!peerConnections.get(peer).isChoked() && !peerConnections.get(peer).isOptimisticallyUnchoked()){
-                            peerConnections.get(peer).choke();
-                            peerConnections.get(peer).sendMessage(Constants.CHOKE);
+                        if(!connectedPeers.get(peer).isChoked() && !connectedPeers.get(peer).isOptimisticallyUnchoked()){
+                            connectedPeers.get(peer).choke();
+                            connectedPeers.get(peer).sendCommand(Constants.CHOKE);
                         }
                     }
                 }
@@ -110,14 +110,14 @@ public class PeerUnchokeScheduler extends Thread{
                 Thread.sleep(commonConfig.getUnchokingInterval() * 1000L);
             }
             catch(Exception e){
-                e.printStackTrace();
+                //e.printStackTrace();
             }
         }
         try{
             Thread.sleep(5000);
         }
         catch(Exception e){
-            e.printStackTrace();
+            //e.printStackTrace();
         }
         System.exit(0);
     }

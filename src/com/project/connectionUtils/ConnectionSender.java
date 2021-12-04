@@ -18,13 +18,10 @@ import java.util.Map;
 
 public class ConnectionSender extends Thread{
     private final int hostID;
-    private final File directory;
-    private final byte[][] filePieces;
     private final Logger logger;
     private final Message msg;
     private final Map<Integer,PeerInfo> peers;
     private final Map<Integer, ConnectionInfo> connnectedPeers;
-    private final CommonConfig commonConfig;
     private final CommonDataStore commonDataStore;
 
     public ConnectionSender(CommonDataStore commonDataStore){
@@ -34,9 +31,7 @@ public class ConnectionSender extends Thread{
         this.connnectedPeers = commonDataStore.getConnections();
         this.logger = commonDataStore.getLogger();
         this.msg = commonDataStore.getMsg();
-        this.commonConfig = commonDataStore.getCommonConfig();
-        this.directory = commonDataStore.getDirectory();
-        this.filePieces = commonDataStore.getFilePieces();
+
     }
 
     @Override
@@ -64,7 +59,7 @@ public class ConnectionSender extends Thread{
                         handshakeMsg.append(new String(Arrays.copyOfRange(buffer, 0, 28)));
                         handshakeMsg.append(id);
                         System.out.println(handshakeMsg);
-                        connnectedPeers.put(id, new ConnectionInfo(peers.get(hostID), connnectedPeers, peers, connection, id, msg, logger, commonConfig,directory,filePieces, commonDataStore));
+                        connnectedPeers.put(id, new ConnectionInfo(commonDataStore,connection,peerID));
                     }
                 }
             }

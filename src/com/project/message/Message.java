@@ -43,7 +43,7 @@ public class Message {
                 break;
             default:
                 message = new byte[0];
-                System.out.println("ERROR in Message: " + type);
+                System.out.println("Corrupt Msg: " + type);
         }
         return message;
     }

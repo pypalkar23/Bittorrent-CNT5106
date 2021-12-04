@@ -29,11 +29,10 @@ public class Helpers {
     }
 
     public static byte[][] getFilePieces(CommonDataStore commonDataStore){
-        int peerID = commonDataStore.getHostID();
         int fileSize = commonDataStore.getCommonConfig().getFileSize();
         int pieceSize = commonDataStore.getCommonConfig().getPieceSize();
         int pieceCount = (int) Math.ceil((double) fileSize / pieceSize);
-        PeerInfo thisPeer = commonDataStore.getPeers().get(peerID);
+        PeerInfo thisPeer = commonDataStore.getPeers().get(commonDataStore.getHostID());
         byte[][] fileMap = new byte[pieceCount][];
         File directory = commonDataStore.getDirectory();
 
@@ -43,13 +42,12 @@ public class Helpers {
                 byte[] fileBytes = new byte[fileSize];
                 file.read(fileBytes);
                 file.close();
-                int part = 0;
-                for (int counter = 0; counter < fileSize; counter += pieceSize) {
-                    if (counter + pieceSize <= fileSize)
-                        fileMap[part] = Arrays.copyOfRange(fileBytes, counter, counter + pieceSize);
+                int block = 0;
+                for (int i = 0; i < fileSize; i += pieceSize) {
+                    if (i + pieceSize <= fileSize)
+                        fileMap[block++] = Arrays.copyOfRange(fileBytes, i, i + pieceSize);
                     else
-                        fileMap[part] = Arrays.copyOfRange(fileBytes, counter, fileSize);
-                    part++;
+                        fileMap[block++] = Arrays.copyOfRange(fileBytes, i, fileSize);
                     thisPeer.updateNumOfPieces();
                 }
             }catch(Exception e){

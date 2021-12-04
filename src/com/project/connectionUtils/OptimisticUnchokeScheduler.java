@@ -18,7 +18,6 @@ public class OptimisticUnchokeScheduler extends Thread {
     Map<Integer, PeerInfo> peers;
     Map<Integer, ConnectionInfo> connectedPeers;
 
-
     public OptimisticUnchokeScheduler(CommonDataStore commonDataStore) {
         this.commonDataStore = commonDataStore;
         this.peers = commonDataStore.getPeers();
@@ -43,21 +42,21 @@ public class OptimisticUnchokeScheduler extends Thread {
                 int randomNumber = Math.abs(r.nextInt() % interested.size());
                 int connection = interested.get(randomNumber);
                 connectedPeers.get(connection).unchoke();
-                connectedPeers.get(connection).sendMessage(Constants.UNCHOKE);
+                connectedPeers.get(connection).sendCommand(Constants.UNCHOKE);
                 connectedPeers.get(connection).optimisticallyUnchoke();
                 logger.hasOptimisticallyUnchokedNeighbour(peer.getPeerID(), connectedPeers.get(connection).getPeerID());
                 try {
-                    Thread.sleep(commonConfig.getOptimisticUnchokingInterval() * 1000);
+                    Thread.sleep(commonConfig.getOptimisticUnchokingInterval() * 1000L);
                     connectedPeers.get(connection).optimisticallyChoke();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    //e.printStackTrace();
                 }
             }
         }
         try {
             Thread.sleep(5000);
         } catch (Exception e) {
-                e.printStackTrace();
+                //e.printStackTrace();
         }
         System.exit(0);
     }

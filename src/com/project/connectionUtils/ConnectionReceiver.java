@@ -56,14 +56,14 @@ public class ConnectionReceiver extends Thread{
                 handshakeMsg.append(new String(Arrays.copyOfRange(buffer, 0, 28)));
                 handshakeMsg.append(otherPeerID);
                 System.out.println(handshakeMsg);
-                connectedPeers.put(otherPeerID, new ConnectionInfo(peer, connectedPeers, peers, connection, otherPeerID, msg, logger, commonConfig, directory, filePieces, commonDataStore));
+                connectedPeers.put(otherPeerID, new ConnectionInfo(commonDataStore,connection, otherPeerID));
                 DataOutputStream opStream = new DataOutputStream(connection.getOutputStream());
                 opStream.flush();
                 opStream.write(msg.getHandshakeMessage(hostID));
             }
         }
         catch(Exception e){
-            e.printStackTrace();
+            //e.printStackTrace();
         }
     }
 }
