@@ -15,26 +15,26 @@ public class Helpers {
         int peerID = commonDataStore.getHostID();
         int fileSize = commonDataStore.getCommonConfig().getFileSize();
         int pieceSize = commonDataStore.getCommonConfig().getPieceSize();
-        int numOfPieces = (int) Math.ceil((double) fileSize / pieceSize);
-        int bitfield[] = new int[numOfPieces];
+        int pieceCount = (int) Math.ceil((double) fileSize / pieceSize);
+        int bitMap[] = new int[pieceCount];
         PeerInfo thisPeer = commonDataStore.getPeers().get(peerID);
         if (thisPeer.getHaveFile() == 1) {
             commonDataStore.incrementCompletedPeers();
-            Arrays.fill(bitfield, 1);
-            thisPeer.setBitfield(bitfield);
+            Arrays.fill(bitMap, 1);
+            thisPeer.setBitfield(bitMap);
         } else {
-            Arrays.fill(bitfield, 0);
-            thisPeer.setBitfield(bitfield);
+            Arrays.fill(bitMap, 0);
+            thisPeer.setBitfield(bitMap);
         }
     }
 
-    public static byte[][] getFilePieces(CommonDataStore commonDataStore) throws IOException {
+    public static byte[][] getFilePieces(CommonDataStore commonDataStore){
         int peerID = commonDataStore.getHostID();
         int fileSize = commonDataStore.getCommonConfig().getFileSize();
         int pieceSize = commonDataStore.getCommonConfig().getPieceSize();
-        int numOfPieces = (int) Math.ceil((double) fileSize / pieceSize);
+        int pieceCount = (int) Math.ceil((double) fileSize / pieceSize);
         PeerInfo thisPeer = commonDataStore.getPeers().get(peerID);
-        byte[][] filePieces = new byte[numOfPieces][];
+        byte[][] fileMap = new byte[pieceCount][];
         File directory = commonDataStore.getDirectory();
 
         if (thisPeer.getHaveFile() == 1) {
@@ -46,9 +46,9 @@ public class Helpers {
                 int part = 0;
                 for (int counter = 0; counter < fileSize; counter += pieceSize) {
                     if (counter + pieceSize <= fileSize)
-                        filePieces[part] = Arrays.copyOfRange(fileBytes, counter, counter + pieceSize);
+                        fileMap[part] = Arrays.copyOfRange(fileBytes, counter, counter + pieceSize);
                     else
-                        filePieces[part] = Arrays.copyOfRange(fileBytes, counter, fileSize);
+                        fileMap[part] = Arrays.copyOfRange(fileBytes, counter, fileSize);
                     part++;
                     thisPeer.updateNumOfPieces();
                 }
@@ -56,12 +56,12 @@ public class Helpers {
                 //e.printStackTrace();
             }
         }
-        return filePieces;
+        return fileMap;
     }
 
     public static void startHelperThreads(CommonDataStore commonDataStore){
-        ConnectionSender sendConnections = new ConnectionSender(commonDataStore);
-        sendConnections.start();
+        ConnectionSender connectionSender = new ConnectionSender(commonDataStore);
+        connectionSender.start();
 
         ConnectionReceiver connectionReceiver = new ConnectionReceiver(commonDataStore);
         connectionReceiver.start();

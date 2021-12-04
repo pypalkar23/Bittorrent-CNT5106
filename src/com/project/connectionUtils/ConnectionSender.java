@@ -59,7 +59,7 @@ public class ConnectionSender extends Thread{
                     if(peerID != id)
                         connection.close();
                     else{
-                        logger.connectionTo(hostID, id);
+                        logger.hasMadeConnectionTo(hostID, id);
                         StringBuilder handshakeMsg = new StringBuilder();
                         handshakeMsg.append(new String(Arrays.copyOfRange(buffer, 0, 28)));
                         handshakeMsg.append(id);

@@ -51,7 +51,7 @@ public class ConnectionReceiver extends Thread{
                 DataInputStream ipStream = new DataInputStream(connection.getInputStream());
                 ipStream.readFully(buffer);
                 int otherPeerID = ByteBuffer.wrap(Arrays.copyOfRange(buffer, 28, 32)).getInt();
-                logger.connectionFrom(hostID, otherPeerID);
+                logger.hasReceivedConnectionFrom(hostID, otherPeerID);
                 StringBuilder handshakeMsg = new StringBuilder();
                 handshakeMsg.append(new String(Arrays.copyOfRange(buffer, 0, 28)));
                 handshakeMsg.append(otherPeerID);

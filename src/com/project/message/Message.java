@@ -5,25 +5,16 @@ import com.project.utils.Constants;
 import java.nio.ByteBuffer;
 
 public class Message {
-    private static final char CHOKE = '0';
-    private static final char UNCHOKE = '1';
-    private static final char INTERESTED = '2';
-    private static final char NOT_INTERESTED = '3';
-    private static final char HAVE = '4';
-    private static final char BITFIELD = '5';
-    private static final char REQUEST = '6';
-    private static final char PIECE = '7';
-
     public byte[] makeMessage(int len, char type, byte[] payload){
         byte[] message;
         byte[] length;
         byte msgType = (byte)type;
         int counter;
         switch(type){
-            case CHOKE:
-            case UNCHOKE:
-            case INTERESTED:
-            case NOT_INTERESTED:
+            case Constants.CHOKE:
+            case Constants.UNCHOKE:
+            case Constants.INTERESTED:
+            case Constants.NOT_INTERESTED:
                 message = new byte[len + 4];
                 length = ByteBuffer.allocate(4).putInt(len).array();
                 counter = 0;
@@ -33,10 +24,10 @@ public class Message {
                 }
                 message[counter] = msgType;
                 break;
-            case HAVE:
-            case BITFIELD:
-            case REQUEST:
-            case PIECE:
+            case Constants.HAVE:
+            case Constants.BITFIELD:
+            case Constants.REQUEST:
+            case Constants.PIECE:
                 message = new byte[len + 4];
                 length = ByteBuffer.allocate(4).putInt(len).array();
                 counter = 0;
@@ -58,24 +49,24 @@ public class Message {
     }
 
     public byte[] getChokeMessage(){
-        return makeMessage(1, CHOKE, null);
+        return makeMessage(1, Constants.CHOKE, null);
     }
 
     public byte[] getUnchokeMessage(){
-        return makeMessage(1, UNCHOKE, null);
+        return makeMessage(1, Constants.UNCHOKE, null);
     }
 
     public byte[] getInterestedMessage(){
-        return makeMessage(1, INTERESTED, null);
+        return makeMessage(1, Constants.INTERESTED, null);
     }
 
     public byte[] getNotInterestedMessage(){
-        return makeMessage(1, NOT_INTERESTED, null);
+        return makeMessage(1, Constants.NOT_INTERESTED, null);
     }
 
     public byte[] getHaveMessage(int pieceIndex){
         byte[] payload = ByteBuffer.allocate(4).putInt(pieceIndex).array();
-        return makeMessage(5, HAVE, payload);
+        return makeMessage(5, Constants.HAVE, payload);
     }
 
     public byte[] getBitfieldMessage(int[] bitfield){
@@ -89,12 +80,12 @@ public class Message {
                 counter++;
             }
         }
-        return makeMessage(len, BITFIELD, payload);
+        return makeMessage(len, Constants.BITFIELD, payload);
     }
 
     public byte[] getRequestMessage(int pieceIndex){
         byte[] payload = ByteBuffer.allocate(4).putInt(pieceIndex).array();
-        return makeMessage(5, REQUEST, payload);
+        return makeMessage(5, Constants.REQUEST, payload);
     }
 
     public byte[] getPieceMessage(int pieceIndex, byte[] piece){
@@ -109,7 +100,7 @@ public class Message {
             payload[counter] = bit;
             counter++;
         }
-        return makeMessage((5 + piece.length), PIECE, payload);
+        return makeMessage((5 + piece.length), Constants.PIECE, payload);
     }
 
     public byte[] getHandshakeMessage(int peerID){

@@ -22,60 +22,60 @@ public class Logger {
 
     public void printToConsoleAndLog(String s){
         printWriter.printf(s);
-        //System.out.print(s);
+        System.out.print(s);
     }
 
-    public void connectionTo(int peerIdSelf, int peerIdOther) { //hasMadeConnection
+    public void hasMadeConnectionTo(int peerIdSelf, int peerIdOther) {
         time = new Date();
         printToConsoleAndLog(String.format("%s : Peer %s makes a connection to Peer %s.\n", timeFormat.format(time), peerIdSelf, peerIdOther));
     }
 
-    public void connectionFrom(int peerIdSelf, int peerIdOther) { //isConnected{
+    public void hasReceivedConnectionFrom(int peerIdSelf, int peerIdOther) {
         time = new Date();
         printToConsoleAndLog(String.format("%s : Peer %s is connected from Peer %s.\n", timeFormat.format(time), peerIdSelf, peerIdOther));
     }
 
-    public void changePreferredNeighbors(int peerIdSelf, int[] neighborList) { //preferredNeighboursChanged
+    public void hasChangedPreferredNeighbours(int peerIdSelf, int[] neighborList) {
         time = new Date();
-        printToConsoleAndLog(String.format("%s : Peer %s has the preferred neighbors %s \n", timeFormat.format(time), peerIdSelf, Arrays.toString(neighborList).replaceAll("\\[|\\]|,|\\s", "")));
+        printToConsoleAndLog(String.format("%s : Peer %s has the preferred neighbors %s \n", timeFormat.format(time), peerIdSelf, Arrays.toString(neighborList).replaceAll("\\[|\\]|\\s", "")));
     }
 
-    public void changeOptimisticallyUnchokedNeighbor(int peerIdSelf, int peerIdOther) { // hasOptimisticallyUnchockedNeighbour
+    public void hasOptimisticallyUnchokedNeighbour(int peerIdSelf, int peerIdOther) {
         time = new Date();
         printToConsoleAndLog(String.format("%s : Peer %s has the optimistically unchoked neighbor %s.\n", timeFormat.format(time), peerIdSelf, peerIdOther));
     }
 
-    public void unchoked(int peerIdSelf, int peerIdOther) { //hasBeenUnchocked
+    public void hasBeenUnchokedBy(int peerIdSelf, int peerIdOther) {
         time = new Date();
         printToConsoleAndLog(String.format("%s : Peer %s is unchoked by %s.\n", timeFormat.format(time), peerIdSelf, peerIdOther));
     }
 
-    public void choked(int peerIdSelf, int neighbor) {
+    public void hasBeenChokedBy(int peerIdSelf, int neighbor) {
         time = new Date();
         printToConsoleAndLog(String.format("%s : Peer %s is choked by %s.\n", timeFormat.format(time), peerIdSelf, neighbor));
     }
 
-    public void receiveHave(int peerIdSelf, int peerIdOther, int pieceIndex) { //hasReceivedHave
+    public void hasReceivedHaveMsg(int peerIdSelf, int peerIdOther, int pieceIndex) {
         time = new Date();
         printToConsoleAndLog(String.format("%s : Peer %s received the 'have' message from %s for the piece %s.\n", timeFormat.format(time), peerIdSelf, peerIdOther, pieceIndex));
     }
 
-    public void receiveInterested(int peerIdSelf, int peerIdOther) { //hasReceivedInterested
+    public void hasReceivedInterestedMsg(int peerIdSelf, int peerIdOther) {
         time = new Date();
         printToConsoleAndLog(String.format("%s : Peer %s received the 'interested' message to %s.\n", timeFormat.format(time), peerIdSelf, peerIdOther));
     }
 
-    public void receiveNotInterested(int peerIdSelf, int peerIdOther) { //hasReceivedNotInterested
+    public void hasReceivedNotInterestedMsg(int peerIdSelf, int peerIdOther) {
         time = new Date();
         printToConsoleAndLog(String.format("%s : Peer %s received the 'not interested' message from %s.\n", timeFormat.format(time), peerIdSelf, peerIdOther));
     }
 
-    public void downloadingPiece(int peerIdSelf, int peerIdOther, int pieceIndex, int numOfPieces) { //hasDownloaded
+    public void hasDownloadedMsg(int peerIdSelf, int peerIdOther, int pieceIndex, int numOfPieces) {
         time = new Date();
         printToConsoleAndLog(String.format("%s : Peer %s has downloaded the piece %s from %s. Now the number of pieces it has is %s.\n", timeFormat.format(time), peerIdSelf, pieceIndex, peerIdOther,  numOfPieces));
     }
 
-    public void downloadCompleted(int peerIdSelf) { //operationCompleted
+    public void hasCompletedDownload(int peerIdSelf) {
         time = new Date();
         printToConsoleAndLog(String.format("%s : Peer %s has downloaded the complete file.\n",timeFormat.format(time), peerIdSelf));
     }

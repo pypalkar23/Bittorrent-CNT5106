@@ -105,7 +105,7 @@ public class PeerUnchokeScheduler extends Thread{
                     }
                 }
             }
-            logger.changePreferredNeighbors(selfPeer.getPeerID(), preferredNeighbors);
+            logger.hasChangedPreferredNeighbours(selfPeer.getPeerID(), preferredNeighbors);
             try{
                 Thread.sleep(commonConfig.getUnchokingInterval() * 1000L);
             }

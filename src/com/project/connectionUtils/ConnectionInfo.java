@@ -7,6 +7,7 @@ import com.project.parserutils.dto.CommonConfig;
 import com.project.parserutils.dto.PeerInfo;
 import com.project.utils.Constants;
 
+
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -42,7 +43,7 @@ public class ConnectionInfo {
         this.peer = peer;
         choked = true;
         downloadRate = 0;
-        (new ReaderThread(this,peerConnections,peer,peers, logger,filePieces, commonConfig, commonDataStore)).start();
+        (new MessageReader(this,peerConnections,peer,peers, logger,filePieces, commonConfig, commonDataStore)).start();
     }
     public double getDownloadRate() {
         return downloadRate;
@@ -182,7 +183,7 @@ public class ConnectionInfo {
                 counter++;
         }
         if (counter == peer.getBitfield().length) {
-            logger.downloadCompleted(peer.getPeerID());
+            logger.hasCompletedDownload(peer.getPeerID());
             counter = 0;
             byte[] merge = new byte[commonConfig.getFileSize()];
             for (byte[] piece : filePieces) {
@@ -197,7 +198,7 @@ public class ConnectionInfo {
                 bos.write(merge);
                 bos.close();
                 file.close();
-                //System.out.println("File Download Completed.");
+                System.out.println("******File Download Completed By This Peer*******");
                 peer.setHaveFile(1);
                 commonDataStore.incrementCompletedPeers();
             } catch (IOException e) {

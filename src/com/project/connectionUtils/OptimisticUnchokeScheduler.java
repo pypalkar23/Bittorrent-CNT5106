@@ -45,7 +45,7 @@ public class OptimisticUnchokeScheduler extends Thread {
                 connectedPeers.get(connection).unchoke();
                 connectedPeers.get(connection).sendMessage(Constants.UNCHOKE);
                 connectedPeers.get(connection).optimisticallyUnchoke();
-                logger.changeOptimisticallyUnchokedNeighbor(peer.getPeerID(), connectedPeers.get(connection).getPeerID());
+                logger.hasOptimisticallyUnchokedNeighbour(peer.getPeerID(), connectedPeers.get(connection).getPeerID());
                 try {
                     Thread.sleep(commonConfig.getOptimisticUnchokingInterval() * 1000);
                     connectedPeers.get(connection).optimisticallyChoke();

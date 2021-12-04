@@ -11,25 +11,25 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.Map;
 
-public class ReaderThread extends Thread{
+public class MessageReader extends Thread{
     private final byte[][] filePieces;
-    private final ConnectionInfo peer;
+    private final ConnectionInfo connectionInfo;
     private final Logger logger;
     private final PeerInfo peerSelf;
     private final CommonConfig commonConfig;
     private final CommonDataStore commonDataStore;
     private final Map<Integer,PeerInfo> peers;
-    private final Map<Integer, ConnectionInfo> peerConnections;
+    private final Map<Integer, ConnectionInfo> connectedPeers;
 
-    public ReaderThread(ConnectionInfo peer, Map<Integer, ConnectionInfo> peerConnections, PeerInfo peerSelf, Map<Integer,PeerInfo> peers, Logger logger, byte[][] filePieces, CommonConfig commonConfig, CommonDataStore commonDataStore){
-        this.peer = peer;
+    public MessageReader(ConnectionInfo connectionInfo, Map<Integer, ConnectionInfo> connectedPeers, PeerInfo peerSelf, Map<Integer,PeerInfo> peers, Logger logger, byte[][] filePieces, CommonConfig commonConfig, CommonDataStore commonDataStore){
+        this.connectionInfo = connectionInfo;
         this.peerSelf = peerSelf;
         this.peers = peers;
         this.filePieces = filePieces;
         this.logger = logger;
         this.commonConfig = commonConfig;
         this.commonDataStore = commonDataStore;
-        this.peerConnections = peerConnections;
+        this.connectedPeers = connectedPeers;
     }
 
     @Override
@@ -39,9 +39,9 @@ public class ReaderThread extends Thread{
         synchronized (this)
         {
             try{
-                DataInputStream ipStream = new DataInputStream(peer.getConnection().getInputStream());
-                peer.sendMessage(Constants.BITFIELD);
-                while(commonDataStore.getCompletedPeers() /*completedPeers*/ < peers.size()){
+                DataInputStream ipStream = new DataInputStream(connectionInfo.getConnection().getInputStream());
+                connectionInfo.sendMessage(Constants.BITFIELD);
+                while(commonDataStore.getCompletedPeers() < peers.size()){
                     int msgLength = ipStream.readInt();
                     byte[] buffer = new byte[msgLength];
                     startTime = (double)System.nanoTime() / Constants.NANOSECOND_DIVISOR;
@@ -58,41 +58,41 @@ public class ReaderThread extends Thread{
                     int bits;
                     switch (msgType){
                         case Constants.CHOKE:
-                            logger.choked(peerSelf.getPeerID(), peer.getPeerID());
-                            peer.choke();
+                            logger.hasBeenChokedBy(peerSelf.getPeerID(), connectionInfo.getPeerID());
+                            connectionInfo.choke();
                             break;
                         case Constants.UNCHOKE:
-                            peer.unchoke();
-                            logger.unchoked(peerSelf.getPeerID(), peer.getPeerID());
-                            peer.getPieceIndex(peerSelf.getBitfield(), peers.get(peer.getPeerID()).getBitfield(), peerSelf.getBitfield().length);
+                            connectionInfo.unchoke();
+                            logger.hasBeenUnchokedBy(peerSelf.getPeerID(), connectionInfo.getPeerID());
+                            connectionInfo.getPieceIndex(peerSelf.getBitfield(), peers.get(connectionInfo.getPeerID()).getBitfield(), peerSelf.getBitfield().length);
                             break;
                         case Constants.INTERESTED:
-                            logger.receiveInterested(peerSelf.getPeerID(), peer.getPeerID());
-                            peer.setInterested();
+                            logger.hasReceivedInterestedMsg(peerSelf.getPeerID(), connectionInfo.getPeerID());
+                            connectionInfo.setInterested();
                             break;
                         case Constants.NOT_INTERESTED:
-                            logger.receiveNotInterested(peerSelf.getPeerID(), peer.getPeerID());
-                            peer.setNotInterested();
-                            if(!peer.isChoked()){
-                                peer.choke();
-                                peer.sendMessage(Constants.CHOKE);
+                            logger.hasReceivedNotInterestedMsg(peerSelf.getPeerID(), connectionInfo.getPeerID());
+                            connectionInfo.setNotInterested();
+                            if(!connectionInfo.isChoked()){
+                                connectionInfo.choke();
+                                connectionInfo.sendMessage(Constants.CHOKE);
                             }
                             break;
                         case Constants.HAVE:
                             index = ByteBuffer.wrap(msg).getInt();
-                            peers.get(peer.getPeerID()).updateBitfield(index);
+                            peers.get(connectionInfo.getPeerID()).updateBitfield(index);
                             bits = 0;
-                            for(int x : peers.get(peer.getPeerID()).getBitfield()){
+                            for(int x : peers.get(connectionInfo.getPeerID()).getBitfield()){
                                 if(x == 1)
                                     bits++;
                             }
                             if(bits == peerSelf.getBitfield().length){
-                                peers.get(peer.getPeerID()).setHaveFile(1);
+                                peers.get(connectionInfo.getPeerID()).setHaveFile(1);
                                 //completedPeers++;
                                 commonDataStore.incrementCompletedPeers();
                             }
-                            peer.compareBitfield(peerSelf.getBitfield(), peers.get(peer.getPeerID()).getBitfield(), peerSelf.getBitfield().length);
-                            logger.receiveHave(peerSelf.getPeerID(), peer.getPeerID(), index);
+                            connectionInfo.compareBitfield(peerSelf.getBitfield(), peers.get(connectionInfo.getPeerID()).getBitfield(), peerSelf.getBitfield().length);
+                            logger.hasReceivedHaveMsg(peerSelf.getPeerID(), connectionInfo.getPeerID(), index);
                             break;
                         case Constants.BITFIELD:
                             int[] bitfield = new int[msg.length/4];
@@ -101,24 +101,24 @@ public class ReaderThread extends Thread{
                                 bitfield[counter] = ByteBuffer.wrap(Arrays.copyOfRange(msg, i, i + 4)).getInt();
                                 counter++;
                             }
-                            peers.get(peer.getPeerID()).setBitfield(bitfield);
+                            peers.get(connectionInfo.getPeerID()).setBitfield(bitfield);
                             bits = 0;
-                            for(int x : peers.get(peer.getPeerID()).getBitfield()){
+                            for(int x : peers.get(connectionInfo.getPeerID()).getBitfield()){
                                 if(x == 1)
                                     bits++;
                             }
                             if(bits == peerSelf.getBitfield().length){
-                                peers.get(peer.getPeerID()).setHaveFile(1);
+                                peers.get(connectionInfo.getPeerID()).setHaveFile(1);
                                 //completedPeers++;
                                 commonDataStore.incrementCompletedPeers();
                             }
                             else{
-                                peers.get(peer.getPeerID()).setHaveFile(0);
+                                peers.get(connectionInfo.getPeerID()).setHaveFile(0);
                             }
-                            peer.compareBitfield(peerSelf.getBitfield(), bitfield, bitfield.length);
+                            connectionInfo.compareBitfield(peerSelf.getBitfield(), bitfield, bitfield.length);
                             break;
                         case Constants.REQUEST:
-                            peer.sendMessage(Constants.PIECE, ByteBuffer.wrap(msg).getInt());
+                            connectionInfo.sendMessage(Constants.PIECE, ByteBuffer.wrap(msg).getInt());
                             break;
                         case Constants.PIECE:
                             index = ByteBuffer.wrap(Arrays.copyOfRange(msg, 0, 4)).getInt();
@@ -130,25 +130,25 @@ public class ReaderThread extends Thread{
                             }
                             peerSelf.updateBitfield(index);
                             peerSelf.updateNumOfPieces();
-                            if(!peer.isChoked()){
-                                peer.getPieceIndex(peerSelf.getBitfield(), peers.get(peer.getPeerID()).getBitfield(), peerSelf.getBitfield().length);
+                            if(!connectionInfo.isChoked()){
+                                connectionInfo.getPieceIndex(peerSelf.getBitfield(), peers.get(connectionInfo.getPeerID()).getBitfield(), peerSelf.getBitfield().length);
                             }
                             double rate = ((double)(msg.length + 5) / (endTime - startTime));
-                            if(peers.get(peer.getPeerID()).getHaveFile() == 1){
-                                peer.setDownloadRate(-1);
+                            if(peers.get(connectionInfo.getPeerID()).getHaveFile() == 1){
+                                connectionInfo.setDownloadRate(-1);
                             }
                             else{
-                                peer.setDownloadRate(rate);
+                                connectionInfo.setDownloadRate(rate);
                             }
-                            logger.downloadingPiece(peerSelf.getPeerID(), peer.getPeerID(), index, peerSelf.getNumOfPieces());
+                            logger.hasDownloadedMsg(peerSelf.getPeerID(), connectionInfo.getPeerID(), index, peerSelf.getNumOfPieces());
                             int downloaded = (peerSelf.getNumOfPieces() * 100) / (int)Math.ceil((double) commonConfig.getFileSize()/ commonConfig.getPieceSize());
-                            StringBuffer sb = new StringBuffer();
+                            /*StringBuffer sb = new StringBuffer();
                             sb.append("\r").append("Downloaded: ");
                             sb.append(downloaded).append("%").append(" Number of Pieces: ").append(peerSelf.getNumOfPieces());
-                            System.out.print(sb);
-                            peer.checkIfComplete();
-                            for(int connection : peerConnections.keySet()){
-                                peerConnections.get(connection).sendMessage(Constants.HAVE, index);
+                            System.out.print(sb);*/
+                            connectionInfo.checkIfComplete();
+                            for(int connection : connectedPeers.keySet()){
+                                connectedPeers.get(connection).sendMessage(Constants.HAVE, index);
                             }
                             break;
                         default:
