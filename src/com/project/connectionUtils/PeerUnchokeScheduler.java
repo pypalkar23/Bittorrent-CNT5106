@@ -1,8 +1,8 @@
 package com.project.connectionUtils;
 
 import com.project.logger.Logger;
-import com.project.parserutils.dto.CommonData;
-import com.project.parserutils.dto.CommonInfo;
+import com.project.parserutils.dto.CommonDataStore;
+import com.project.parserutils.dto.CommonConfig;
 import com.project.parserutils.dto.PeerInfo;
 import com.project.utils.Constants;
 
@@ -10,28 +10,28 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Random;
 
-public class UnchokePeers extends Thread{
-    private CommonData commonData;
-    private Map<Integer, PeerInfo> peers;
-    private Map<Integer,PeerConnection> peerConnections;
-    private CommonInfo common;
-    private Logger logger;
-    private PeerInfo selfPeer;
+public class PeerUnchokeScheduler extends Thread{
+    private final Logger logger;
+    private final PeerInfo selfPeer;
+    private final CommonConfig commonConfig;
+    private final CommonDataStore commonDataStore;
+    private final Map<Integer, PeerInfo> peers;
+    private final Map<Integer, ConnectionInfo> peerConnections;
 
-    public UnchokePeers(Map<Integer,PeerInfo> peers,Map<Integer,PeerConnection> peerConnections,PeerInfo selfPeer, CommonInfo common, CommonData data, Logger log){
-        this.commonData = data;
-        this.peers = peers;
-        this.peerConnections = peerConnections;
-        this.common = common;
-        this.logger = log;
-        this.selfPeer = selfPeer;
+    public PeerUnchokeScheduler(CommonDataStore commonDataStore){
+        this.commonDataStore = commonDataStore;
+        this.peers = commonDataStore.getPeers();
+        this.peerConnections = commonDataStore.getConnections();
+        this.commonConfig = commonDataStore.getCommonConfig();
+        this.logger = commonDataStore.getLogger();
+        this.selfPeer = this.peers.get(commonDataStore.getHostID());
     }
 
     @Override
     public void run(){
-        while(commonData.getCompletedPeers() < peers.size()){
+        while(commonDataStore.getCompletedPeers() < peers.size()){
             ArrayList<Integer> connections = new ArrayList<>(peerConnections.keySet());
-            int[] preferredNeighbors = new int[common.getNumberOfPreferredNeighbors()];
+            int[] preferredNeighbors = new int[commonConfig.getNumberOfPreferredNeighbors()];
             if(selfPeer.getHaveFile() == 1) {
                 ArrayList<Integer> interestedPeers = new ArrayList<>();
                 for (int peer : connections) {
@@ -39,7 +39,7 @@ public class UnchokePeers extends Thread{
                         interestedPeers.add(peer);
                 }
                 if (interestedPeers.size() > 0) {
-                    if (interestedPeers.size() <= common.getNumberOfPreferredNeighbors()) {
+                    if (interestedPeers.size() <= commonConfig.getNumberOfPreferredNeighbors()) {
                         for (Integer peer : interestedPeers) {
                             if(peerConnections.get(peer).isChoked()){
                                 peerConnections.get(peer).unchoke();
@@ -48,7 +48,7 @@ public class UnchokePeers extends Thread{
                         }
                     } else {
                         Random r = new Random();
-                        for (int i = 0; i < common.getNumberOfPreferredNeighbors(); i++) {
+                        for (int i = 0; i < commonConfig.getNumberOfPreferredNeighbors(); i++) {
                             preferredNeighbors[i] = (interestedPeers.remove(Math.abs(r.nextInt() % interestedPeers.size())));
                         }
                         for (int peer : preferredNeighbors) {
@@ -73,7 +73,7 @@ public class UnchokePeers extends Thread{
                     if(peerConnections.get(peer).isInterested() && peerConnections.get(peer).getDownloadRate() >= 0)
                         interestedPeers.add(peer);
                 }
-                if(interestedPeers.size() <= common.getNumberOfPreferredNeighbors()){
+                if(interestedPeers.size() <= commonConfig.getNumberOfPreferredNeighbors()){
                     for(int peer : interestedPeers){
                         preferredNeighbors[counter++] = peer;
                         if(peerConnections.get(peer).isChoked()){
@@ -83,7 +83,7 @@ public class UnchokePeers extends Thread{
                     }
                 }
                 else {
-                    for (int i = 0; i < common.getNumberOfPreferredNeighbors(); i++) {
+                    for (int i = 0; i < commonConfig.getNumberOfPreferredNeighbors(); i++) {
                         int max = interestedPeers.get(0);
                         for(int j = 1; j < interestedPeers.size(); j++){
                             if(peerConnections.get(max).getDownloadRate() <= peerConnections.get(interestedPeers.get(j)).getDownloadRate()){
@@ -107,17 +107,17 @@ public class UnchokePeers extends Thread{
             }
             logger.changePreferredNeighbors(selfPeer.getPeerID(), preferredNeighbors);
             try{
-                Thread.sleep(common.getUnchokingInterval() * 1000);
+                Thread.sleep(commonConfig.getUnchokingInterval() * 1000L);
             }
             catch(Exception e){
-//                    e.printStackTrace();
+                e.printStackTrace();
             }
         }
         try{
             Thread.sleep(5000);
         }
         catch(Exception e){
-
+            e.printStackTrace();
         }
         System.exit(0);
     }

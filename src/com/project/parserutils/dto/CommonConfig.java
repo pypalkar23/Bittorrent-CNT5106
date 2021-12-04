@@ -1,12 +1,12 @@
 package com.project.parserutils.dto;
 
-public class CommonConfigDetails {
+public class CommonConfig {
     private int numberOfPreferredNeighbors;
     private int unchokingInterval;
     private int optimisticUnchokingInterval;
     private String fileName;
     private int fileSize;
-    private int chunkSize; // stands for piecesize
+    private int pieceSize;
 
     public int getNumberOfPreferredNeighbors() {
         return numberOfPreferredNeighbors;
@@ -48,23 +48,11 @@ public class CommonConfigDetails {
         this.fileSize = fileSize;
     }
 
-    public int getChunkSize() {
-        return chunkSize;
+    public int getPieceSize() {
+        return pieceSize;
     }
 
-    public void setChunkSize(int chunkSize) {
-        this.chunkSize = chunkSize;
-    }
-
-    @Override
-    public String toString() {
-        return "CommonConfigDetails{" +
-                "numberOfPreferredNeighbors=" + numberOfPreferredNeighbors +
-                ", unchokingInterval=" + unchokingInterval +
-                ", optimisticUnchokingInterval=" + optimisticUnchokingInterval +
-                ", fileName='" + fileName + '\'' +
-                ", fileSize=" + fileSize +
-                ", chunkSize=" + chunkSize +
-                '}';
+    public void setPieceSize(int pieceSize) {
+        this.pieceSize = pieceSize;
     }
 }

@@ -3,12 +3,13 @@ package com.project;
 
 import com.project.connectionUtils.*;
 import com.project.logger.Logger;
-import com.project.message.Messages;
-import com.project.parserutils.dto.CommonData;
-import com.project.parserutils.dto.CommonInfo;
+import com.project.message.Message;
+import com.project.parserutils.dto.CommonDataStore;
+import com.project.parserutils.dto.CommonConfig;
 import com.project.parserutils.dto.PeerInfo;
 import com.project.parserutils.parsers.CommonConfigReader;
 import com.project.parserutils.parsers.PeerConfigReader;
+import com.project.utils.Helpers;
 
 import java.io.*;
 import java.util.*;
@@ -18,19 +19,25 @@ public class peerProcess {
     private static int hostID;
     private static Map<Integer, PeerInfo> peers;
     private static byte[][] filePieces;
-    private static Messages msg = new Messages();
-    private static File log_file;
     private static Logger logger;
-    private static Map<Integer, PeerConnection> peerConnections;
-    private static PeerInfo thisPeer;
-    private static CommonInfo common;
+    private static Map<Integer, ConnectionInfo> peerConnections;
+    private static CommonConfig commonConfig;
     private static File directory;
-    private static CommonData commonData;
+    private static CommonDataStore commonDataStore;
 
     public static void main(String[] args) {
-        commonData = new CommonData();
+        commonDataStore = new CommonDataStore();
         System.out.println("Starting Process");
-        hostID = Integer.parseInt(args[0]);
+
+        try {
+            hostID = Integer.parseInt(args[0]);
+            commonDataStore.setHostID(hostID);
+        } catch (NumberFormatException e) {
+            System.out.println("The hostID should be node ID that is mentioned in the PeerInfo.cfg file");
+        } catch (Exception e) {
+            System.out.println("The hostID should be node ID that is mentioned in the PeerInfo.cfg file");
+        }
+
         try {
             /*
              *   Create the file directory corresponding to this peer.
@@ -40,55 +47,32 @@ public class peerProcess {
                 directory.mkdir();
             }
 
+            commonDataStore.setDirectory(directory);
 
             logger = new Logger(hostID);
+            commonDataStore.setLogger(logger);
 
             peers = PeerConfigReader.getConfiguration();
-            common = CommonConfigReader.loadFile();
-            thisPeer = peers.get(hostID);
-            int fileSize = common.getFileSize();
-            int pieceSize = common.getPieceSize();
-            int numOfPieces = (int) Math.ceil((double) fileSize / pieceSize);
-            filePieces = new byte[numOfPieces][];
-            int bitfieldSize = numOfPieces;
-            int[] bitfield = new int[bitfieldSize];
-            if (thisPeer.getHaveFile() == 1) {
-                //completedPeers++;
-                commonData.incrementCompletedPeers();
-                Arrays.fill(bitfield, 1);
-                thisPeer.setBitfield(bitfield);
-                //Dividing File into pieces and storing them into array of pieces.
-                BufferedInputStream file = new BufferedInputStream(new FileInputStream(directory.getAbsolutePath() + "/" + common.getFileName()));
-                byte[] fileBytes = new byte[fileSize];
-                file.read(fileBytes);
-                file.close();
-                int part = 0;
+            commonDataStore.setPeers(peers);
 
-                for (int counter = 0; counter < fileSize; counter += pieceSize) {
-                    //byte[] pieceBytes = Arrays.copyOfRange(fileBytes, counter, counter + pieceSize);
-                    if (counter + pieceSize <= fileSize)
-                        filePieces[part] = Arrays.copyOfRange(fileBytes, counter, counter + pieceSize);
-                    else
-                        filePieces[part] = Arrays.copyOfRange(fileBytes, counter, fileSize);
-                    part++;
-                    thisPeer.updateNumOfPieces();
-                }
-            } else {
-                Arrays.fill(bitfield, 0);
-                thisPeer.setBitfield(bitfield);
-            }
+            Message msg = new Message();
+            commonDataStore.setMsg(msg);
+
+            commonConfig = CommonConfigReader.loadFile();
+            commonDataStore.setCommonConfig(commonConfig);
+
+            Helpers.setBitfieldForPeer(commonDataStore);
+
+            filePieces = Helpers.getFilePieces(commonDataStore);
+            commonDataStore.setFilePieces(filePieces);
 
             peerConnections = new ConcurrentHashMap<>();
-            SendConnections sendConnections = new SendConnections(hostID, peers, peerConnections, logger, msg, common, directory, filePieces, commonData);
-            sendConnections.start();
-            ReceiveConnections receiveConnections = new ReceiveConnections(hostID, peers, peerConnections, logger, msg, common, directory, filePieces, commonData);
-            receiveConnections.start();
-            UnchokePeers unchokePeers = new UnchokePeers(peers, peerConnections, thisPeer, common, commonData, logger);
-            unchokePeers.start();
-            OptimisticUnchokePeer optimisticUnchokePeer = new OptimisticUnchokePeer(thisPeer, peers, peerConnections, common, commonData, logger);
-            optimisticUnchokePeer.start();
+            commonDataStore.setConnections(peerConnections);
+            Helpers.startHelperThreads(commonDataStore);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
 }

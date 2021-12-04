@@ -2,6 +2,7 @@ package com.project.utils;
 
 public class Constants {
     public static final String MSG_HEADER = "P2PFILESHARINGPROJ";
+    public static final String PADDED_STRING = "0000000000";
     public static final String NO_OF_PREF_NEIGHBOURS_FIELD = "NumberOfPreferredNeighbors";
     public static final String UNCHOKING_INTERVAL_FIELD = "UnchokingInterval";
     public static final String OPTIMISTIC_UNCHOKING_INTERVAL = "OptimisticUnchokingInterval";
@@ -18,4 +19,6 @@ public class Constants {
     public static final char BITFIELD = '5';
     public static final char REQUEST = '6';
     public static final char PIECE = '7';
+    public static final int NANOSECOND_DIVISOR = 100000000;
+    public static final int BYTE_SIZE = 32;
 }

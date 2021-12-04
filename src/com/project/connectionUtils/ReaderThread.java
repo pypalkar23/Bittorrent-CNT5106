@@ -1,8 +1,8 @@
 package com.project.connectionUtils;
 
 import com.project.logger.Logger;
-import com.project.parserutils.dto.CommonData;
-import com.project.parserutils.dto.CommonInfo;
+import com.project.parserutils.dto.CommonDataStore;
+import com.project.parserutils.dto.CommonConfig;
 import com.project.parserutils.dto.PeerInfo;
 import com.project.utils.Constants;
 
@@ -12,22 +12,23 @@ import java.util.Arrays;
 import java.util.Map;
 
 public class ReaderThread extends Thread{
-    private PeerConnection peer;
-    private PeerInfo peerSelf;
-    private Logger logger;
-    private Map<Integer,PeerInfo> peers;
-    Map<Integer,PeerConnection> peerConnections;
-    byte[][] filePieces;
-    CommonInfo commonInfo;
-    CommonData commonData;
-    public ReaderThread(PeerConnection peer, Map<Integer,PeerConnection> peerConnections, PeerInfo peerSelf, Map<Integer,PeerInfo> peers, Logger logger, byte[][] filePieces, CommonInfo commonInfo, CommonData commonData){
+    private final byte[][] filePieces;
+    private final ConnectionInfo peer;
+    private final Logger logger;
+    private final PeerInfo peerSelf;
+    private final CommonConfig commonConfig;
+    private final CommonDataStore commonDataStore;
+    private final Map<Integer,PeerInfo> peers;
+    private final Map<Integer, ConnectionInfo> peerConnections;
+
+    public ReaderThread(ConnectionInfo peer, Map<Integer, ConnectionInfo> peerConnections, PeerInfo peerSelf, Map<Integer,PeerInfo> peers, Logger logger, byte[][] filePieces, CommonConfig commonConfig, CommonDataStore commonDataStore){
         this.peer = peer;
         this.peerSelf = peerSelf;
         this.peers = peers;
         this.filePieces = filePieces;
         this.logger = logger;
-        this.commonInfo = commonInfo;
-        this.commonData = commonData;
+        this.commonConfig = commonConfig;
+        this.commonDataStore = commonDataStore;
         this.peerConnections = peerConnections;
     }
 
@@ -38,14 +39,14 @@ public class ReaderThread extends Thread{
         synchronized (this)
         {
             try{
-                DataInputStream dataInputStream = new DataInputStream(peer.getConnection().getInputStream());
+                DataInputStream ipStream = new DataInputStream(peer.getConnection().getInputStream());
                 peer.sendMessage(Constants.BITFIELD);
-                while(commonData.getCompletedPeers() /*completedPeers*/ < peers.size()){
-                    int msgLength = dataInputStream.readInt();
+                while(commonDataStore.getCompletedPeers() /*completedPeers*/ < peers.size()){
+                    int msgLength = ipStream.readInt();
                     byte[] buffer = new byte[msgLength];
-                    startTime = (double)System.nanoTime() / 100000000;
-                    dataInputStream.readFully(buffer);
-                    endTime = (double)System.nanoTime() / 100000000;
+                    startTime = (double)System.nanoTime() / Constants.NANOSECOND_DIVISOR;
+                    ipStream.readFully(buffer);
+                    endTime = (double)System.nanoTime() / Constants.NANOSECOND_DIVISOR;
                     char msgType = (char)buffer[0];
                     byte[] msg = new byte[msgLength - 1];
                     int counter = 0;
@@ -88,7 +89,7 @@ public class ReaderThread extends Thread{
                             if(bits == peerSelf.getBitfield().length){
                                 peers.get(peer.getPeerID()).setHaveFile(1);
                                 //completedPeers++;
-                                commonData.incrementCompletedPeers();
+                                commonDataStore.incrementCompletedPeers();
                             }
                             peer.compareBitfield(peerSelf.getBitfield(), peers.get(peer.getPeerID()).getBitfield(), peerSelf.getBitfield().length);
                             logger.receiveHave(peerSelf.getPeerID(), peer.getPeerID(), index);
@@ -109,7 +110,7 @@ public class ReaderThread extends Thread{
                             if(bits == peerSelf.getBitfield().length){
                                 peers.get(peer.getPeerID()).setHaveFile(1);
                                 //completedPeers++;
-                                commonData.incrementCompletedPeers();
+                                commonDataStore.incrementCompletedPeers();
                             }
                             else{
                                 peers.get(peer.getPeerID()).setHaveFile(0);
@@ -140,12 +141,12 @@ public class ReaderThread extends Thread{
                                 peer.setDownloadRate(rate);
                             }
                             logger.downloadingPiece(peerSelf.getPeerID(), peer.getPeerID(), index, peerSelf.getNumOfPieces());
-                            int downloaded = (peerSelf.getNumOfPieces() * 100) / (int)Math.ceil((double)commonInfo.getFileSize()/commonInfo.getPieceSize());
+                            int downloaded = (peerSelf.getNumOfPieces() * 100) / (int)Math.ceil((double) commonConfig.getFileSize()/ commonConfig.getPieceSize());
                             StringBuffer sb = new StringBuffer();
                             sb.append("\r").append("Downloaded: ");
                             sb.append(downloaded).append("%").append(" Number of Pieces: ").append(peerSelf.getNumOfPieces());
                             System.out.print(sb);
-                            peer.checkCompleted();
+                            peer.checkIfComplete();
                             for(int connection : peerConnections.keySet()){
                                 peerConnections.get(connection).sendMessage(Constants.HAVE, index);
                             }
@@ -158,7 +159,7 @@ public class ReaderThread extends Thread{
                 System.exit(0);
             }
             catch(Exception e){
-//                        e.printStackTrace();
+                e.printStackTrace();
             }
         }
     }

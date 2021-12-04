@@ -7,19 +7,16 @@ public class PeerInfo {
     private int haveFile;
     private int[] bitfield;
     private int numOfPieces = 0;
+
     public PeerInfo(){
 
     }
+
     public PeerInfo (String peerId, String hostName,String portNumber,String haveFile){
          this.peerID = Integer.parseInt(peerId);
          this.hostName = hostName;
          this.portNumber = Integer.parseInt(portNumber);
          this.haveFile = Integer.parseInt(haveFile);
-    }
-
-    public void printBitfield(){
-        for(int bit : bitfield)
-            System.out.print(bit);
     }
 
     public int getNumOfPieces() {
@@ -36,24 +33,12 @@ public class PeerInfo {
         return peerID;
     }
 
-    public void setPeerID(int peerID) {
-        this.peerID = peerID;
-    }
-
     public String getHostName() {
         return hostName;
     }
 
-    public void setHostName(String hostName) {
-        this.hostName = hostName;
-    }
-
     public int getPortNumber() {
         return portNumber;
-    }
-
-    public void setPortNumber(int portNumber) {
-        this.portNumber = portNumber;
     }
 
     public int getHaveFile() {
