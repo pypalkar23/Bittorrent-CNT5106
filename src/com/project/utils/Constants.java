@@ -9,8 +9,8 @@ public class Constants {
     public static final String FILENAME_FIELD = "FileName";
     public static final String FILESIZE_FIELD = "FileSize";
     public static final String PIECE_SIZE_FIELD = "PieceSize";
-    public static final String COMMON_CONFIG_FILE_NAME= "Common.cfg";
-    public static final String PEER_CONFIG_FILE_NAME= "PeerInfo.cfg";
+    public static final String COMMON_CONFIG_FILE_NAME = "Common.cfg";
+    public static final String PEER_CONFIG_FILE_NAME = "PeerInfo.cfg";
     public static final char CHOKE_MSG = '1';
     public static final char UNCHOKE_MSG = '2';
     public static final char INTERESTED_MSG = '3';
