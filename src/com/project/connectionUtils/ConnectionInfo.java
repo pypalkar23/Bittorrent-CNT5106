@@ -100,19 +100,19 @@ public class ConnectionInfo {
             DataOutputStream opStream = new DataOutputStream(connection.getOutputStream());
             opStream.flush();
             switch (type) {
-                case Constants.CHOKE:
+                case Constants.CHOKE_MSG:
                     opStream.write(msg.getChokeMessage());
                     break;
-                case Constants.UNCHOKE:
+                case Constants.UNCHOKE_MSG:
                     opStream.write(msg.getUnchokeMessage());
                     break;
-                case Constants.INTERESTED:
+                case Constants.INTERESTED_MSG:
                     opStream.write(msg.getInterestedMessage());
                     break;
-                case Constants.NOT_INTERESTED:
+                case Constants.NOT_INTERESTED_MSG:
                     opStream.write(msg.getNotInterestedMessage());
                     break;
-                case Constants.BITFIELD:
+                case Constants.BITFIELD_MSG:
                     opStream.write(msg.getBitfieldMessage(peer.getBitfield()));
                     break;
                 default:
@@ -129,13 +129,13 @@ public class ConnectionInfo {
             DataOutputStream opStream = new DataOutputStream(connection.getOutputStream());
             opStream.flush();
             switch (type) {
-                case Constants.HAVE:
+                case Constants.HAVE_MSG:
                     opStream.write(msg.getHaveMessage(index));
                     break;
-                case Constants.REQUEST:
+                case Constants.REQUEST_MSG:
                     opStream.write(msg.getRequestMessage(index));
                     break;
-                case Constants.PIECE:
+                case Constants.PIECE_MSG:
                     opStream.write(msg.getPieceMessage(index, filePieces[index]));
                     break;
                 default:
@@ -151,12 +151,12 @@ public class ConnectionInfo {
         int i;
         for (i = 0; i < len; i++) {
             if (peerBitFieldSelf[i] == 0 && peerBitFieldOther[i] == 1) {
-                sendCommand(Constants.INTERESTED);
+                sendCommand(Constants.INTERESTED_MSG);
                 break;
             }
         }
         if (i == len)
-            sendCommand(Constants.NOT_INTERESTED);
+            sendCommand(Constants.NOT_INTERESTED_MSG);
     }
 
     public void getPieceIndex(int[] peerBitFieldSelf, int[] peerBitFieldOther, int len) {
@@ -170,7 +170,7 @@ public class ConnectionInfo {
         Random r = new Random();
         if (indices.size() > 0) {
             int index = indices.get(Math.abs(r.nextInt() % indices.size()));
-            sendFileRelatedMessage(Constants.REQUEST, index);
+            sendFileRelatedMessage(Constants.REQUEST_MSG, index);
         }
     }
 

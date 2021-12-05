@@ -42,7 +42,7 @@ public class OptimisticUnchokeScheduler extends Thread {
                 int randomNumber = Math.abs(r.nextInt() % interested.size());
                 int connection = interested.get(randomNumber);
                 connectedPeers.get(connection).unchoke();
-                connectedPeers.get(connection).sendCommand(Constants.UNCHOKE);
+                connectedPeers.get(connection).sendCommand(Constants.UNCHOKE_MSG);
                 connectedPeers.get(connection).optimisticallyUnchoke();
                 logger.hasOptimisticallyUnchokedNeighbour(peer.getPeerID(), connectedPeers.get(connection).getPeerID());
                 try {

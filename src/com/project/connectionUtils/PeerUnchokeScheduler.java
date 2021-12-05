@@ -43,7 +43,7 @@ public class PeerUnchokeScheduler extends Thread{
                         for (Integer peer : interestedPeers) {
                             if(connectedPeers.get(peer).isChoked()){
                                 connectedPeers.get(peer).unchoke();
-                                connectedPeers.get(peer).sendCommand(Constants.UNCHOKE);
+                                connectedPeers.get(peer).sendCommand(Constants.UNCHOKE_MSG);
                             }
                         }
                     } else {
@@ -54,13 +54,13 @@ public class PeerUnchokeScheduler extends Thread{
                         for (int peer : preferredNeighbors) {
                             if(connectedPeers.get(peer).isChoked()){
                                 connectedPeers.get(peer).unchoke();
-                                connectedPeers.get(peer).sendCommand(Constants.UNCHOKE);
+                                connectedPeers.get(peer).sendCommand(Constants.UNCHOKE_MSG);
                             }
                         }
                         for (Integer peer : interestedPeers) {
                             if(!connectedPeers.get(peer).isChoked() && !connectedPeers.get(peer).isOptimisticallyUnchoked()){
                                 connectedPeers.get(peer).choke();
-                                connectedPeers.get(peer).sendCommand(Constants.CHOKE);
+                                connectedPeers.get(peer).sendCommand(Constants.CHOKE_MSG);
                             }
                         }
                     }
@@ -78,7 +78,7 @@ public class PeerUnchokeScheduler extends Thread{
                         preferredNeighbors[counter++] = peer;
                         if(connectedPeers.get(peer).isChoked()){
                             connectedPeers.get(peer).unchoke();
-                            connectedPeers.get(peer).sendCommand(Constants.UNCHOKE);
+                            connectedPeers.get(peer).sendCommand(Constants.UNCHOKE_MSG);
                         }
                     }
                 }
@@ -92,7 +92,7 @@ public class PeerUnchokeScheduler extends Thread{
                         }
                         if(connectedPeers.get(max).isChoked()) {
                             connectedPeers.get(max).unchoke();
-                            connectedPeers.get(max).sendCommand(Constants.UNCHOKE);
+                            connectedPeers.get(max).sendCommand(Constants.UNCHOKE_MSG);
                         }
                         preferredNeighbors[i] = max;
                         interestedPeers.remove(Integer.valueOf(max));
@@ -100,7 +100,7 @@ public class PeerUnchokeScheduler extends Thread{
                     for (Integer peer : interestedPeers) {
                         if(!connectedPeers.get(peer).isChoked() && !connectedPeers.get(peer).isOptimisticallyUnchoked()){
                             connectedPeers.get(peer).choke();
-                            connectedPeers.get(peer).sendCommand(Constants.CHOKE);
+                            connectedPeers.get(peer).sendCommand(Constants.CHOKE_MSG);
                         }
                     }
                 }

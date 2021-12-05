@@ -40,7 +40,7 @@ public class MessageReader extends Thread{
         {
             try{
                 DataInputStream ipStream = new DataInputStream(connectionInfo.getConnection().getInputStream());
-                connectionInfo.sendCommand(Constants.BITFIELD);
+                connectionInfo.sendCommand(Constants.BITFIELD_MSG);
                 while(commonDataStore.getCompletedPeers() < peers.size()){
                     int msgLength = ipStream.readInt();
                     byte[] buffer = new byte[msgLength];
@@ -57,28 +57,28 @@ public class MessageReader extends Thread{
                     int index;
                     int bits;
                     switch (msgType){
-                        case Constants.CHOKE:
+                        case Constants.CHOKE_MSG:
                             logger.hasBeenChokedBy(peerSelf.getPeerID(), connectionInfo.getPeerID());
                             connectionInfo.choke();
                             break;
-                        case Constants.UNCHOKE:
+                        case Constants.UNCHOKE_MSG:
                             connectionInfo.unchoke();
                             logger.hasBeenUnchokedBy(peerSelf.getPeerID(), connectionInfo.getPeerID());
                             connectionInfo.getPieceIndex(peerSelf.getBitfield(), peers.get(connectionInfo.getPeerID()).getBitfield(), peerSelf.getBitfield().length);
                             break;
-                        case Constants.INTERESTED:
+                        case Constants.INTERESTED_MSG:
                             logger.hasReceivedInterestedMsg(peerSelf.getPeerID(), connectionInfo.getPeerID());
                             connectionInfo.setInterested();
                             break;
-                        case Constants.NOT_INTERESTED:
+                        case Constants.NOT_INTERESTED_MSG:
                             logger.hasReceivedNotInterestedMsg(peerSelf.getPeerID(), connectionInfo.getPeerID());
                             connectionInfo.setNotInterested();
                             if(!connectionInfo.isChoked()){
                                 connectionInfo.choke();
-                                connectionInfo.sendCommand(Constants.CHOKE);
+                                connectionInfo.sendCommand(Constants.CHOKE_MSG);
                             }
                             break;
-                        case Constants.HAVE:
+                        case Constants.HAVE_MSG:
                             index = ByteBuffer.wrap(msg).getInt();
                             peers.get(connectionInfo.getPeerID()).updateBitfield(index);
                             bits = 0;
@@ -94,7 +94,7 @@ public class MessageReader extends Thread{
                             connectionInfo.compareBitfield(peerSelf.getBitfield(), peers.get(connectionInfo.getPeerID()).getBitfield(), peerSelf.getBitfield().length);
                             logger.hasReceivedHaveMsg(peerSelf.getPeerID(), connectionInfo.getPeerID(), index);
                             break;
-                        case Constants.BITFIELD:
+                        case Constants.BITFIELD_MSG:
                             int[] bitfield = new int[msg.length/4];
                             counter = 0;
                             for(int i = 0; i < msg.length; i += 4){
@@ -116,10 +116,10 @@ public class MessageReader extends Thread{
                             }
                             connectionInfo.compareBitfield(peerSelf.getBitfield(), bitfield, bitfield.length);
                             break;
-                        case Constants.REQUEST:
-                            connectionInfo.sendFileRelatedMessage(Constants.PIECE, ByteBuffer.wrap(msg).getInt());
+                        case Constants.REQUEST_MSG:
+                            connectionInfo.sendFileRelatedMessage(Constants.PIECE_MSG, ByteBuffer.wrap(msg).getInt());
                             break;
-                        case Constants.PIECE:
+                        case Constants.PIECE_MSG:
                             index = ByteBuffer.wrap(Arrays.copyOfRange(msg, 0, 4)).getInt();
                             counter = 0;
                             filePieces[index] = new byte[msg.length - 4];
@@ -143,7 +143,7 @@ public class MessageReader extends Thread{
                             int downlaadPercentage = (peerSelf.getNumOfPieces() * 100) / (int)Math.ceil((double) commonConfig.getFileSize()/ commonConfig.getPieceSize());
                             connectionInfo.checkIfComplete();
                             for(int connection : connectedPeers.keySet()){
-                                connectedPeers.get(connection).sendFileRelatedMessage(Constants.HAVE, index);
+                                connectedPeers.get(connection).sendFileRelatedMessage(Constants.HAVE_MSG, index);
                             }
                             break;
                         default:
