@@ -1,7 +1,7 @@
 package com.project.connectionUtils;
 
 import com.project.logger.Logger;
-import com.project.message.Message;
+import com.project.message.MessageUtil;
 import com.project.parserutils.dto.CommonDataStore;
 import com.project.parserutils.dto.CommonConfig;
 import com.project.parserutils.dto.PeerInfo;
@@ -21,7 +21,7 @@ public class ConnectionInfo {
     private double downloadRate;
     private final PeerInfo peer;
     private final int peerID;
-    private final Message msg;
+    private final MessageUtil msg;
     private final Logger logger;
     private final File directory;
     private final byte[][] filePieces;
@@ -101,19 +101,19 @@ public class ConnectionInfo {
             opStream.flush();
             switch (type) {
                 case Constants.CHOKE_MSG:
-                    opStream.write(msg.getChokeMessage());
+                    opStream.write(msg.prepareChokeMessage());
                     break;
                 case Constants.UNCHOKE_MSG:
-                    opStream.write(msg.getUnchokeMessage());
+                    opStream.write(msg.prepareUnchokeMessage());
                     break;
                 case Constants.INTERESTED_MSG:
-                    opStream.write(msg.getInterestedMessage());
+                    opStream.write(msg.prepareInterestedMessage());
                     break;
                 case Constants.NOT_INTERESTED_MSG:
-                    opStream.write(msg.getNotInterestedMessage());
+                    opStream.write(msg.prepareNotInterestedMessage());
                     break;
                 case Constants.BITFIELD_MSG:
-                    opStream.write(msg.getBitfieldMessage(peer.getBitfield()));
+                    opStream.write(msg.prepareBitfieldMessage(peer.getBitfield()));
                     break;
                 default:
                     break;
@@ -130,13 +130,13 @@ public class ConnectionInfo {
             opStream.flush();
             switch (type) {
                 case Constants.HAVE_MSG:
-                    opStream.write(msg.getHaveMessage(index));
+                    opStream.write(msg.prepareHaveMessage(index));
                     break;
                 case Constants.REQUEST_MSG:
-                    opStream.write(msg.getRequestMessage(index));
+                    opStream.write(msg.prepareRequestMessage(index));
                     break;
                 case Constants.PIECE_MSG:
-                    opStream.write(msg.getPieceMessage(index, filePieces[index]));
+                    opStream.write(msg.preparePieceMessage(index, filePieces[index]));
                     break;
                 default:
                     break;

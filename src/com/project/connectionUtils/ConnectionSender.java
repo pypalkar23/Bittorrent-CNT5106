@@ -1,7 +1,7 @@
 package com.project.connectionUtils;
 
 import com.project.logger.Logger;
-import com.project.message.Message;
+import com.project.message.MessageUtil;
 import com.project.parserutils.dto.CommonDataStore;
 import com.project.parserutils.dto.PeerInfo;
 import com.project.utils.Constants;
@@ -17,7 +17,7 @@ import java.util.Map;
 public class ConnectionSender extends Thread{
     private final int hostID;
     private final Logger logger;
-    private final Message msg;
+    private final MessageUtil msg;
     private final Map<Integer,PeerInfo> peers;
     private final Map<Integer, ConnectionInfo> connnectedPeers;
     private final CommonDataStore commonDataStore;
@@ -44,7 +44,7 @@ public class ConnectionSender extends Thread{
                     Socket connection = new Socket(connPeer.getHostName(), connPeer.getPortNumber());
                     DataOutputStream opStream = new DataOutputStream(connection.getOutputStream());
                     opStream.flush();
-                    opStream.write(msg.getHandshakeMessage(hostID));
+                    opStream.write(msg.prepareHandshakeMessage(hostID));
                     opStream.flush();
                     DataInputStream ipStream = new DataInputStream(connection.getInputStream());
                     ipStream.readFully(buffer);

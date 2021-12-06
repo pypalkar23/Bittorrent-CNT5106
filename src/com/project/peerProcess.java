@@ -3,7 +3,7 @@ package com.project;
 
 import com.project.connectionUtils.*;
 import com.project.logger.Logger;
-import com.project.message.Message;
+import com.project.message.MessageUtil;
 import com.project.parserutils.dto.CommonDataStore;
 import com.project.parserutils.dto.CommonConfig;
 import com.project.parserutils.dto.PeerInfo;
@@ -44,7 +44,7 @@ public class peerProcess {
             Map<Integer, PeerInfo> peers = PeerConfigReader.getConfiguration();
             commonDataStore.setPeers(peers);
 
-            Message msg = new Message();
+            MessageUtil msg = new MessageUtil();
             commonDataStore.setMsg(msg);
 
             CommonConfig commonConfig = CommonConfigReader.loadFile();

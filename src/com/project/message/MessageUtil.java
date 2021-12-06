@@ -4,8 +4,8 @@ import com.project.utils.Constants;
 
 import java.nio.ByteBuffer;
 
-public class Message {
-    public byte[] makeMessage(int len, char type, byte[] payload){
+public class MessageUtil {
+    public byte[] prepareMessage(int len, char type, byte[] payload){
         byte[] message;
         byte[] length;
         byte msgType = (byte)type;
@@ -48,28 +48,28 @@ public class Message {
         return message;
     }
 
-    public byte[] getChokeMessage(){
-        return makeMessage(1, Constants.CHOKE_MSG, null);
+    public byte[] prepareChokeMessage(){
+        return prepareMessage(1, Constants.CHOKE_MSG, null);
     }
 
-    public byte[] getUnchokeMessage(){
-        return makeMessage(1, Constants.UNCHOKE_MSG, null);
+    public byte[] prepareUnchokeMessage(){
+        return prepareMessage(1, Constants.UNCHOKE_MSG, null);
     }
 
-    public byte[] getInterestedMessage(){
-        return makeMessage(1, Constants.INTERESTED_MSG, null);
+    public byte[] prepareInterestedMessage(){
+        return prepareMessage(1, Constants.INTERESTED_MSG, null);
     }
 
-    public byte[] getNotInterestedMessage(){
-        return makeMessage(1, Constants.NOT_INTERESTED_MSG, null);
+    public byte[] prepareNotInterestedMessage(){
+        return prepareMessage(1, Constants.NOT_INTERESTED_MSG, null);
     }
 
-    public byte[] getHaveMessage(int pieceIndex){
+    public byte[] prepareHaveMessage(int pieceIndex){
         byte[] payload = ByteBuffer.allocate(4).putInt(pieceIndex).array();
-        return makeMessage(5, Constants.HAVE_MSG, payload);
+        return prepareMessage(5, Constants.HAVE_MSG, payload);
     }
 
-    public byte[] getBitfieldMessage(int[] bitfield){
+    public byte[] prepareBitfieldMessage(int[] bitfield){
         int len = 1 + (4 * bitfield.length);
         byte[] payload = new byte[len - 1];
         int counter = 0;
@@ -80,15 +80,15 @@ public class Message {
                 counter++;
             }
         }
-        return makeMessage(len, Constants.BITFIELD_MSG, payload);
+        return prepareMessage(len, Constants.BITFIELD_MSG, payload);
     }
 
-    public byte[] getRequestMessage(int pieceIndex){
+    public byte[] prepareRequestMessage(int pieceIndex){
         byte[] payload = ByteBuffer.allocate(4).putInt(pieceIndex).array();
-        return makeMessage(5, Constants.REQUEST_MSG, payload);
+        return prepareMessage(5, Constants.REQUEST_MSG, payload);
     }
 
-    public byte[] getPieceMessage(int pieceIndex, byte[] piece){
+    public byte[] preparePieceMessage(int pieceIndex, byte[] piece){
         byte[] payload = new byte[4 + piece.length];
         int counter = 0;
         byte[] indexBytes = ByteBuffer.allocate(4).putInt(pieceIndex).array();
@@ -100,10 +100,10 @@ public class Message {
             payload[counter] = bit;
             counter++;
         }
-        return makeMessage((5 + piece.length), Constants.PIECE_MSG, payload);
+        return prepareMessage((5 + piece.length), Constants.PIECE_MSG, payload);
     }
 
-    public byte[] getHandshakeMessage(int peerID){
+    public byte[] prepareHandshakeMessage(int peerID){
         byte[] message = new byte[32];
         byte[] header = Constants.MSG_HEADER.getBytes();
         byte[] zerobits = Constants.PADDED_STRING.getBytes();

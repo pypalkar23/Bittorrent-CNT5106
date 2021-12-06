@@ -2,7 +2,7 @@ package com.project.parserutils.dto;
 
 import com.project.connectionUtils.ConnectionInfo;
 import com.project.logger.Logger;
-import com.project.message.Message;
+import com.project.message.MessageUtil;
 
 import java.io.File;
 import java.util.Map;
@@ -15,7 +15,7 @@ public class CommonDataStore {
     private Map<Integer,PeerInfo> peers;
     private Map<Integer, ConnectionInfo> connections;
     private Logger logger;
-    private Message msg;
+    private MessageUtil msg;
     private CommonConfig commonConfig;
     private File directory;
     private byte[][] filePieces;
@@ -70,11 +70,11 @@ public class CommonDataStore {
         this.logger = logger;
     }
 
-    public Message getMsg() {
+    public MessageUtil getMsg() {
         return msg;
     }
 
-    public void setMsg(Message msg) {
+    public void setMsg(MessageUtil msg) {
         this.msg = msg;
     }
 

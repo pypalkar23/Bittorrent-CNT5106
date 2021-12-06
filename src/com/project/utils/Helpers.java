@@ -70,4 +70,21 @@ public class Helpers {
         OptimisticUnchokeScheduler optimisticUnchokeScheduler = new OptimisticUnchokeScheduler(commonDataStore);
         optimisticUnchokeScheduler.start();
     }
+
+    public static String getNeighbourString(int[] neighbourList){
+        boolean isEmpty = true;
+        StringBuffer sb = new StringBuffer();
+        for(int neighbour:neighbourList){
+            if(neighbour!=0){
+                isEmpty = false;
+                sb.append(" "+neighbour);
+                sb.append(",");
+            }
+        }
+
+        if(!isEmpty){
+            return sb.substring(0,sb.length()-1);
+        }
+        return null;
+    }
 }

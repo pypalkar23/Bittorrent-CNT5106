@@ -1,5 +1,7 @@
 package com.project.logger;
 
+import com.project.utils.Helpers;
+
 import java.io.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -37,7 +39,10 @@ public class Logger {
 
     public void hasChangedPreferredNeighbours(int peerIdSelf, int[] neighborList) {
         time = new Date();
-        printToConsoleAndLog(String.format("%s : Peer %s has the preferred neighbors %s \n", timeFormat.format(time), peerIdSelf, Arrays.toString(neighborList).replaceAll("\\[|\\]|\\s", "")));
+        String neighbourString = Helpers.getNeighbourString(neighborList);
+        if(neighborList!=null){
+            printToConsoleAndLog(String.format("%s : Peer %s has the preferred neighbors%s \n", timeFormat.format(time), peerIdSelf, neighbourString));
+        }
     }
 
     public void hasOptimisticallyUnchokedNeighbour(int peerIdSelf, int peerIdOther) {

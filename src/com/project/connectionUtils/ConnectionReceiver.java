@@ -1,7 +1,7 @@
 package com.project.connectionUtils;
 
 import com.project.logger.Logger;
-import com.project.message.Message;
+import com.project.message.MessageUtil;
 import com.project.parserutils.dto.CommonDataStore;
 import com.project.parserutils.dto.CommonConfig;
 import com.project.parserutils.dto.PeerInfo;
@@ -20,7 +20,7 @@ public class ConnectionReceiver extends Thread{
     int hostID;
     PeerInfo peer;
     Logger logger;
-    Message msg;
+    MessageUtil msg;
     File directory;
     byte[][] filePieces;
     Map<Integer, ConnectionInfo> connectedPeers;
@@ -59,7 +59,7 @@ public class ConnectionReceiver extends Thread{
                 connectedPeers.put(otherPeerID, new ConnectionInfo(commonDataStore,connection, otherPeerID));
                 DataOutputStream opStream = new DataOutputStream(connection.getOutputStream());
                 opStream.flush();
-                opStream.write(msg.getHandshakeMessage(hostID));
+                opStream.write(msg.prepareHandshakeMessage(hostID));
             }
         }
         catch(Exception e){
