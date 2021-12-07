@@ -15,6 +15,7 @@ public class MessageUtil {
             case Constants.UNCHOKE_MSG:
             case Constants.INTERESTED_MSG:
             case Constants.NOT_INTERESTED_MSG:
+            case Constants.EXIT_MSG:
                 message = new byte[len + 4];
                 length = ByteBuffer.allocate(4).putInt(len).array();
                 counter = 0;
@@ -62,6 +63,10 @@ public class MessageUtil {
 
     public byte[] prepareNotInterestedMessage(){
         return prepareMessage(1, Constants.NOT_INTERESTED_MSG, null);
+    }
+
+    public byte[] prepareExitMessage(){
+        return prepareMessage(1, Constants.EXIT_MSG, null);
     }
 
     public byte[] prepareHaveMessage(int pieceIndex){

@@ -19,6 +19,7 @@ public class Constants {
     public static final char BITFIELD_MSG = '6';
     public static final char REQUEST_MSG = '7';
     public static final char PIECE_MSG = '8';
+    public static final char EXIT_MSG ='9';
     public static final int NANOSECOND_DIVISOR = 100000000;
     public static final int BYTE_SIZE = 32;
 }

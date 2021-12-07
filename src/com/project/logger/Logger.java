@@ -40,7 +40,7 @@ public class Logger {
     public void hasChangedPreferredNeighbours(int peerIdSelf, int[] neighborList) {
         time = new Date();
         String neighbourString = Helpers.getNeighbourString(neighborList);
-        if(neighborList!=null){
+        if(neighbourString!=null){
             printToConsoleAndLog(String.format("%s : Peer %s has the preferred neighbors%s \n", timeFormat.format(time), peerIdSelf, neighbourString));
         }
     }

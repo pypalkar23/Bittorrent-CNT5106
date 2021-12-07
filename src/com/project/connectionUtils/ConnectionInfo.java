@@ -115,6 +115,9 @@ public class ConnectionInfo {
                 case Constants.BITFIELD_MSG:
                     opStream.write(msg.prepareBitfieldMessage(peer.getBitfield()));
                     break;
+                case Constants.EXIT_MSG:
+                    opStream.write(msg.prepareExitMessage());
+                    break;
                 default:
                     break;
             }

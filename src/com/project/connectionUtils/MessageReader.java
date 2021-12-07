@@ -57,6 +57,10 @@ public class MessageReader extends Thread{
                     int index;
                     int bits;
                     switch (msgType){
+                        case Constants.EXIT_MSG:
+                            //System.out.println("****Exit Msg Received*****");
+                            System.exit(0);
+                            break;
                         case Constants.CHOKE_MSG:
                             logger.hasBeenChokedBy(peerSelf.getPeerID(), connectionInfo.getPeerID());
                             connectionInfo.choke();
@@ -148,6 +152,11 @@ public class MessageReader extends Thread{
                             break;
                         default:
                             break;
+                    }
+                }
+                if(peers.get(peerSelf.getPeerID()).getHaveFile() == 1){
+                    for(int connection : connectedPeers.keySet()){
+                        connectedPeers.get(connection).sendCommand(Constants.EXIT_MSG);
                     }
                 }
                 Thread.sleep(1000);
