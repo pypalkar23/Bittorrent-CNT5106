@@ -199,7 +199,7 @@ public class ConnectionInfo {
                 bos.write(merge);
                 bos.close();
                 file.close();
-                System.out.println("******File Download Completed By This Peer*******");
+                System.out.println("\n\n******File Download Completed By This Peer*******\n\n");
                 peer.setHaveFile(1);
                 commonDataStore.incrementCompletedPeers();
             } catch (IOException e) {
