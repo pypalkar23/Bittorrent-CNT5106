@@ -55,4 +55,16 @@ public class CommonConfig {
     public void setPieceSize(int pieceSize) {
         this.pieceSize = pieceSize;
     }
+
+
+    @Override
+    public String toString() {
+        return " numberOfPreferredNeighbors = " + numberOfPreferredNeighbors +
+                        "\n unchokingInterval = " + unchokingInterval +
+                        "\n optimisticUnchokingInterval =" + optimisticUnchokingInterval +
+                        "\n fileName = '" + fileName + '\'' +
+                        "\n fileSize = " + fileSize +
+                        "\n pieceSize = " + pieceSize +
+                        "\n\n";
+    }
 }

@@ -49,11 +49,15 @@ public class peerProcess {
 
             CommonConfig commonConfig = CommonConfigReader.loadFile();
             commonDataStore.setCommonConfig(commonConfig);
+            logger.hasConfig(hostID, commonConfig.toString());
 
             Helpers.setBitfieldForPeer(commonDataStore);
+            logger.hasBitfield(hostID, peers.get(hostID).getBitfield());
 
             byte[][] filePieces = Helpers.getFilePieces(commonDataStore);
             commonDataStore.setFilePieces(filePieces);
+
+            Thread.sleep(2000L);
 
             Map<Integer, ConnectionInfo> connectedPeers = new ConcurrentHashMap<>();
             commonDataStore.setConnections(connectedPeers);

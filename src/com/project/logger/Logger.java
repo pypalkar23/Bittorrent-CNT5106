@@ -84,4 +84,18 @@ public class Logger {
         time = new Date();
         printToConsoleAndLog(String.format("%s : Peer %s has downloaded the complete file.\n",timeFormat.format(time), peerIdSelf));
     }
+
+    public void hasBitfield(int peerId, int[] bitfield){
+        time = new Date();
+        StringBuffer sb = new StringBuffer();
+        for(int i:bitfield){
+            sb.append(i);
+        }
+        printToConsoleAndLog(String.format("%s : Peer %s has set bitfield to: \n%s\n\n",timeFormat.format(time), peerId, sb));
+    }
+
+    public void hasConfig(int peerId, String Config){
+        time = new Date();
+        printToConsoleAndLog(String.format("%s : Peer %s has set variables to:\n%s\n",timeFormat.format(time), peerId, Config));
+    }
 }

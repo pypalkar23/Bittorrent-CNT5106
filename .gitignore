@@ -5,3 +5,4 @@
 **/jar/com
 **/jar/META-INF
 **/.DS_Store
+**/*.class
